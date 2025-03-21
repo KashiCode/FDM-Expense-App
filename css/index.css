@@ -4,14 +4,28 @@
     font-family: Noto Sans Tangsa;
 }
 
-/* FDM STUFF */
+/*------------------------------------FDM-------------------------------------- */
 
 .logo{
-    width: 8rem;
+    height: 4rem;
+    margin-left: 1rem;
+}
+
+#signUpMessage {
+    color: #3b4045;
+    text-align: center;
+    margin-top: 50px;
 }
 
 
-/*           */
+/*------------------------------------------------------------------------------*/
+
+
+
+
+
+
+
 header {
     position: sticky;
     top: 0;
