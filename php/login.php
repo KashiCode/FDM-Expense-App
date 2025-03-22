@@ -30,6 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Store user data in session
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['employeeId'] = $user['employeeId'];
+            
 
             // Update loggedIn timestamp
             $setLoggedIn = "UPDATE employees SET loggedIn = NOW() WHERE username = ?";

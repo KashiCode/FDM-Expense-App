@@ -14,10 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $manager = new Manager();
     if ($manager->createManager($firstName, $lastName, $email, $username, $password, $spendingLimit)) {
         $message = "Manager created successfully!";
+        header("Location: create_manager.php");
+        exit();
     } else {
         $message = "Error creating manager.";
     }
 }
+
 ?>
 
 <!DOCTYPE html>

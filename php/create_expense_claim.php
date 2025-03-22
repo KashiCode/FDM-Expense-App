@@ -1,0 +1,112 @@
+<?php
+session_start();
+require_once "models/ExpenseClaim.php";
+
+// Ensure the user is logged in
+if (!isset($_SESSION["employeeId"])) {
+    header("Location: ../login.html");;
+}
+
+$message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $employeeId = $_SESSION["employeeId"];
+    $amount = $_POST["amount"];
+    $description = $_POST["description"];
+    $category = $_POST["category"];
+    $currency = $_POST["currency"];
+
+    // Handle file upload
+    $evidenceFile = "";
+    
+    if (!empty($_FILES["evidenceFile"]["name"])) {
+        $uploadDir = "uploads/";
+        $fileType = strtolower(pathinfo($_FILES["evidenceFile"]["name"], PATHINFO_EXTENSION));
+        $fileName = uniqid() . "_" . basename($_FILES["evidenceFile"]["name"]);
+        $evidenceFile = $uploadDir . $fileName;
+
+        if (move_uploaded_file($_FILES["evidenceFile"]["tmp_name"], $evidenceFile)) {
+            // File successfully uploaded
+        } else {
+            $message = "Error uploading file.";
+        }
+    }
+
+    // Create the expense claim
+    $claim = new ExpenseClaim();
+    if ($claim->createClaim($employeeId, $amount, $description, $category, $evidenceFile, "", $currency)) {
+        $_SESSION["message"] = "Expense claim submitted successfully!";
+        header("Location: create_expense_claim.php"); // Redirect to clear the form
+        exit();
+    } else {
+        $message = "Error submitting claim.";
+    }
+}
+
+// Show message after redirection
+if (isset($_SESSION["message"])) {
+    $message = $_SESSION["message"];
+    unset($_SESSION["message"]); // Remove message after displaying it
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Expense Claim</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('imagePreview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+</head>
+<body>
+    <h1>Create Expense Claim</h1>
+
+    <?php if ($message): ?>
+        <p id="signUpMessage"><?php echo $message; ?></p>
+    <?php endif; ?>
+
+    <form method="post" action="" enctype="multipart/form-data">
+    <label for="amount">Amount:</label>
+        <div class="currecy-amount">
+            <select id="currency" name="currency" required>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="AUD">AUD</option>
+            </select>
+            <input type="number" step="0.01" name="amount" required>
+        </div>
+        <label for="description">Description:</label>
+        <textarea name="description" required></textarea>
+
+        <label for="category">Category:</label>
+        <select name="category" required>
+            <option value="Travel">Travel</option>
+            <option value="Food">Food</option>
+            <option value="Office Supplies">Office Supplies</option>
+            <option value="Accommodation">Accommodation</option>
+        </select>
+
+        <label for="evidenceFile">Upload Evidence:</label>
+        <label class="file-upload" for="image">
+            <input type="file" id="image" name="evidenceFile" accept="image/*" onchange="previewImage(event)" required>
+            Choose Image
+        </label>
+        <img id="imagePreview" src="" style="display:none; max-width: 300px; margin-top: 10px;">
+
+        <button type="submit">Submit Claim</button>
+    </form>
+</body>
+</html>

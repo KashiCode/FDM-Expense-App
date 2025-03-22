@@ -14,19 +14,19 @@ class Manager extends Employee {
     // TODO: Implement searchEmployeeClaims method
 
     // Get the manager's team (list of employees under them)
-    public function getTeam($managerID) {
-        $sql = "SELECT * FROM employees WHERE manager = :managerID";
+    public function getTeam($managerId) {
+        $sql = "SELECT * FROM employees WHERE manager = :managerId";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':managerID', $managerID);
+        $stmt->bindParam(':managerId', $managerId);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Return employee list
     }
 
     // Get the spending limit of a manager
-    public function getSpendingLimit($managerID) {
-        $sql = "SELECT spendingLimit FROM managers WHERE managerID = :managerID";
+    public function getSpendingLimit($managerId) {
+        $sql = "SELECT spendingLimit FROM managers WHERE managerId = :managerId";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':managerID', $managerID);
+        $stmt->bindParam(':managerId', $managerId);
         $stmt->execute();
         return $stmt->fetchColumn();
     }
@@ -51,14 +51,19 @@ class Manager extends Employee {
             $stmt1->execute();
 
             // Get the last inserted employeeID
-            $managerID = $this->conn->lastInsertId();
+            $managerId = $this->conn->lastInsertId();
 
             // Insert into managers table
-            $sql2 = "INSERT INTO managers (managerID, spendingLimit) VALUES (:managerID, :spendingLimit)";
+            $sql2 = "INSERT INTO managers (managerId, spendingLimit) VALUES (:managerId, :spendingLimit)";
             $stmt2 = $this->conn->prepare($sql2);
-            $stmt2->bindParam(':managerID', $managerID);
+            $stmt2->bindParam(':managerId', $managerId);
             $stmt2->bindParam(':spendingLimit', $spendingLimit);
             $stmt2->execute();
+
+            $sql3 = "UPDATE employees SET manager = $managerId WHERE employeeID = $managerId";
+            $stmt3 = $this->conn->prepare($sql3);
+            $stmt3->bindParam(':managerId', $managerId);
+            $stmt3->execute();
 
             // Commit transaction
             $this->conn->commit();

@@ -31,6 +31,5 @@ class Employee {
     // TODO: Implement the editClaim function
     // TODO: Implement the deleteClaim function
     // TODO: Implement the searchClaim function
-    // TODO: Implement the logout function (the loggedIn attribute should be of type dateTime and something should check if the user was logged in for more than a day)
 }
 ?>

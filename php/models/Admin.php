@@ -15,10 +15,10 @@ class Admin extends Employee {
         return $stmt->execute();
     }
 
-    public function updateSpendingLimit($managerID, $newLimit) {
-        $sql = "UPDATE managers SET spendingLimit = :newLimit WHERE managerID = :managerID";
+    public function updateSpendingLimit($managerId, $newLimit) {
+        $sql = "UPDATE managers SET spendingLimit = :newLimit WHERE managerId = :managerId";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(':managerID', $managerID);
+        $stmt->bindParam(':managerId', $managerId);
         $stmt->bindParam(':newLimit', $newLimit);
         return $stmt->execute();
     }

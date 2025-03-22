@@ -1,3 +1,14 @@
+<?php
+    session_start();
+    if(!isset($_SESSION['employeeId'])){
+        header("Location: ../login.html");
+    }
+    if($_SESSION['role'] != 'Employee'){
+        header("Location: ../login.html");
+    }
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +46,7 @@
         <section class="weather-map">
             <h3>View Claims</h3>
             <div class="tabs">
-                <button>Create Claim</button>
+                <button onclick="window.location.href='create_expense_claim.php';">Create Claim</button>
             </div>
             <br>
             <div class="report">

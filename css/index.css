@@ -9,12 +9,27 @@
 .logo{
     height: 4rem;
     margin-left: 1rem;
+    color: #ffffff;
 }
 
 #signUpMessage {
-    color: #3b4045;
+    color: #ffffff;
     text-align: center;
     margin-top: 50px;
+}
+
+.currency-amount {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#currency {
+    color: #ffffff;
+    font-weight: bold;
+    margin-left: 10px;
+    width: 50px;
 }
 
 
@@ -37,7 +52,7 @@ header nav {
     width: 100%;
     display: flex;
     flex-direction: row;
-    background-color: #f1f2f3;
+    background-color: #273549;
     font-weight: bold;
     border-radius: 5px;
     text-align: left;
@@ -49,7 +64,7 @@ header nav {
 }
 
 h3 {
-    color: #3b4045;
+    color: #ffffff;
     font-weight: bold;
     margin-left: 10px;
 }
@@ -58,7 +73,7 @@ a, h3 {
     transition: color 0.2s ease-in-out;
 }
 a:hover h3{
-    color: #6d8ba7;
+    color: #374151;
 }
 
 .bold {
@@ -70,12 +85,12 @@ a:hover h3{
     color: inherit;
 }
 .inline:hover {
-    color: #6d8ba7;
+    color: #374151;
     text-decoration: underline;
 }
 
 p {
-    color: #3b4045;
+    color: #ffffff;
 }
 
 #icon{
@@ -94,16 +109,16 @@ header li {
     margin: 0 10px;
 }
 header a {
-    color: #3b4045a4;
+    color: #ffffffa4;
     text-decoration: none;
     transition: color 0.2s ease-in-out;
 }
 header a:hover {
-    color: #6d8ba7;
+    color: #374151;
 }
 
 body {
-    background-color: #ffffff;
+    background-color: #121826;
 }
 
 button {
@@ -114,23 +129,22 @@ button {
     width: 200px;
     height: 50px;
     border-radius: 10px;
-    background-color: #ffffff;
-    border: #d6d9dc solid 1px;
+    background: #2C3C54;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     outline: none;
-    color: #3b4045;
+    color: #ffffff;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
 }
 
 button:hover {
-    background-color: #6d8ba7;
+    background-color: #374151;
     color: #ffffff;
-    border: #6d8ba7 solid 1px;
 }
 
 h1 {
-    color: #3b4045;
+    color: #ffffff;
     text-align: center;
     font-size: 2.5em;
     margin-top: 50px;
@@ -141,8 +155,9 @@ section {
     flex-direction: column;
     margin: 20px;
     padding: 10px;
-    background-color: #fafafa;
-    border-radius: 5px;
+    background: #273549;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 article {
@@ -169,16 +184,16 @@ figure {
     padding: 5px;
     border: none;
     outline: none;
-    background-color: #f1f2f3;
-    color: #3b4045;
+    background-color: #273549;
+    color: #ffffff;
     border-radius: 5px;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 
 .active, .collapsible:hover{
-    background-color: #6d8ba7;
-    color: #ffffff;
+    background-color: #374151;
+    color: #121826;
     border: none;
     outline: none;
 }
@@ -190,14 +205,14 @@ figure {
     height: 0;
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
-    border-left: 8px solid #3b4045; /* Right-facing arrow */
+    border-left: 8px solid #ffffff; /* Right-facing arrow */
     margin-left: 5px;
 }
 
 .active:after {
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 8px solid #3b4045;
+    border-top: 8px solid #ffffff;
     margin-left: 5px;
 }
 
@@ -236,26 +251,26 @@ figure {
     align-items: center;
     width: 80%;
     margin: 0 auto;
-    background-color: #ffffff;
+    background-color: #121826;
     border-radius: 5px;
 }
 
 #navigateButton {
     height: 150px;
     width: 80%;
-    background-color: #ffffff;
+    background-color: #121826;
     border-radius: 10px;
     outline: none;
     border: none;
-    color: #3b4045;
+    color: #ffffff;
     font-size: 24px;
     font-weight: bold;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 #navigateButton:hover {
-    background-color: #6d8ba7;
-    color: #ffffff;
+    background-color: #374151;
+    color: #121826;
 }
 
 .aboutMe {
@@ -275,7 +290,7 @@ figure {
     margin: 0 auto;
 }
 .experience article {
-    background-color: #f1f2f3;
+    background-color: #273549;
     border-radius: 5px;
 }
 
@@ -286,7 +301,7 @@ figure {
     margin: 0 auto;
 }
 .education article {
-    background-color: #f1f2f3;
+    background-color: #273549;
     border-radius: 5px;
 }
 .education article ul{
@@ -309,12 +324,12 @@ figure {
     margin: 0 auto;
 }
 .contact article {
-    background-color: #f1f2f3;
+    background-color: #273549;
     border-radius: 5px;
 }
 
 figcaption {
-    color: #3b4045;
+    color: #ffffff;
     font-size: x-small;
 }
 
@@ -339,7 +354,7 @@ figcaption {
     gap: 1%;
     margin: 20px;
     padding: 10px;
-    background-color: #f1f2f3;
+    background-color: #273549;
     border-radius: 5px;
     transition: color 0.2s ease-in-out;
 }
@@ -359,7 +374,7 @@ figcaption {
 }
 .post a:hover{
     text-decoration: underline;
-    color: #6d8ba7;
+    color: #374151;
 }
 
 #viewPostSection {
@@ -368,7 +383,7 @@ figcaption {
     margin: 20px;
     gap: 20px;
     padding: 10px;
-    background-color: #f1f2f3;
+    background-color: #273549;
     border-radius: 5px;
   }
 
@@ -392,13 +407,13 @@ figcaption {
     height: 26.41vw; /* Set appropriate size */
     background-image: url('../images/Intel\ Core\ i7\ 6700\ CPU\ Die\ Shot\ Low-Res.jpg');
     background-size: cover;
-    outline: solid 0px #6d8ba7;
+    outline: solid 0px #374151;
     border-radius: 5px;
     transition: outline 0.05s ease-in-out;
 }
 
 .dieshot:hover {
-    outline: 3px solid #6d8ba7;
+    outline: 3px solid #374151;
     border-radius: 5px;
     transition: outline 0.1s ease-in-out;
 }
@@ -434,11 +449,11 @@ figcaption {
     font-size: 18px;
     transition: 0.6s ease;
     user-select: none;
-    background-color: #6d8ba727;
+    background-color: #37415127;
   }
 
 .prev:hover, .next:hover{
-    background-color: #6d8ba7cc;
+    background-color: #374151cc;
 }
 .prev {
     left: 0;
@@ -456,13 +471,13 @@ figcaption {
     margin: 10px 0 0 5px    ;
     background-color: transparent;
     border-radius: 50%;
-    border: #6d8ba7 solid 1px;
+    border: #374151 solid 1px;
     display: inline-block;
     transition: background-color 0.6s ease;
 }
 
 .selected, .dot:hover {
-    background-color: #6d8ba7;
+    background-color: #374151;
   }
 
 #viewPostSectionNoImage {
@@ -471,7 +486,7 @@ figcaption {
     margin: 20px;
     gap: 20px;
     padding: 10px;
-    background-color: #f1f2f3;
+    background-color: #273549;
     border-radius: 5px;
 }
 
@@ -494,8 +509,8 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #ffffff;
-    color: #3b4045;
+    background-color: #121826;
+    color: #ffffff;
     font-weight: bold;
     height: 100px;
 }
@@ -508,7 +523,7 @@ form {
     width: 400px;
     margin: 0 auto;
     border-radius: 10px;
-    background-color: #f1f2f3;
+    background-color: #273549;
     padding: 20px;
 }
 
@@ -529,7 +544,7 @@ form {
 
 #deleteButton:hover{
     background-color: #d40606;
-    color: #ffffff;
+    color: #121826;
     border: #d40606 solid 1px;
 }
 
@@ -555,11 +570,19 @@ input[type="text"] {
     border-radius: 5px;
     border: none;
     outline: none;
-    border: 1px solid #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: #121826;
+    color: #ffffff;
 }
 
 input[type="file"] {
     display: none;
+}
+
+label {
+    color: #ffffff;
+    font-weight: bold;
+    margin: 10px;
 }
 
 label.file-upload {
@@ -570,17 +593,52 @@ label.file-upload {
     width: 100px;
     height: 25px;
     border-radius: 5px;
-    background-color: #b4cfe7;
-    color:#3b4045;
+    background: #2C3C54;
+    color:#ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     font-size: 12px;
+    cursor: pointer;
 }
 
+
 label.file-upload:hover {
-    background-color: #6d8ba7;
+    background-color: #374151;
 }
 
 label.file-upload input[type="file"] {
     display: none;
+}
+
+#imagePreview {
+    margin: auto;
+    width: 100%;
+    border-radius: 5px;
+    background: #2C3C54;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+input[type="number"] {
+    width: 50%;
+    margin-bottom: 10px;
+    height: 40px;
+    border-radius: 5px;
+    background-color: #121826;
+    color: #ffffff;
+    border: none;
+    outline: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+form select {
+    width: 100%;
+    margin-bottom: 10px;
+    height: 40px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: #121826;
+    color: #ffffff;
 }
 
 form textarea{
@@ -590,17 +648,19 @@ form textarea{
     border-radius: 5px;
     border: none;
     outline: none;
-    border: 1px solid #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: #121826;
+    color: #ffffff;
 }
 input[type="date"]{
     width: 100%;
     margin-bottom: 10px;
     height: 40px;
     border-radius: 5px;
-    background-color: #ffffff;
+    background-color: #121826;
     border: none;
     outline: none;
-    border: 1px solid #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 input[type="submit"],
@@ -608,12 +668,12 @@ input[type="reset"] {
     width: 100%;
     padding: 10px;
     border-radius: 5px;
-    background-color: #ffffff;
-    color: #f1f2f3;
+    background-color: #121826;
+    color: #273549;
     font-size: 16px;
     cursor: pointer;
 }
 
 input[type="submit"]:hover {
-    background-color: #6d8ba7;
+    background-color: #374151;
 }

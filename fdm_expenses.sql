@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 21, 2025 at 05:39 PM
+-- Generation Time: Mar 22, 2025 at 09:23 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -36,18 +36,17 @@ CREATE TABLE `employees` (
   `username` varchar(50) NOT NULL,
   `passwordHash` varchar(255) NOT NULL,
   `manager` int(11) DEFAULT NULL,
-  `loggedIn` tinyint(1) DEFAULT current_timestamp(),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `spendingLimit` decimal(10,2) DEFAULT 0.00
+  `loggedIn` date DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `employees`
 --
 
-INSERT INTO `employees` (`employeeId`, `firstName`, `lastName`, `email`, `role`, `username`, `passwordHash`, `manager`, `loggedIn`, `created_at`, `spendingLimit`) VALUES
-(3, 'Test', 'Manager', 'testmanager@gmail.com', 'Manager', 'testmanager', '$2y$10$u5q1LHxArgbnsYBOCFfvW.r2/vsBw2WUHtsABPokvJlSWC7useebW', NULL, 127, '2025-03-21 16:03:58', 0.00),
-(7, 'John', 'Smithc', 'johnsmith@fdm.com', 'Employee', 'johnsmith', '$2y$10$6ejJoqvW..8nG3sn.1uef.HWhnHekGljFnQuLFxpgKBkVoRGVNT6K', 3, 127, '2025-03-21 16:35:50', 0.00);
+INSERT INTO `employees` (`employeeId`, `firstName`, `lastName`, `email`, `role`, `username`, `passwordHash`, `manager`, `loggedIn`, `created_at`) VALUES
+(3, 'Test', 'Manager', 'testmanager@gmail.com', 'Manager', 'testmanager', '$2y$10$u5q1LHxArgbnsYBOCFfvW.r2/vsBw2WUHtsABPokvJlSWC7useebW', NULL, '2025-03-22', '2025-03-21 16:03:58'),
+(7, 'John', 'Smith', 'johnsmith@fdm.com', 'Employee', 'johnsmith', '$2y$10$6ejJoqvW..8nG3sn.1uef.HWhnHekGljFnQuLFxpgKBkVoRGVNT6K', 3, '2000-01-27', '2025-03-21 16:35:50');
 
 -- --------------------------------------------------------
 
@@ -64,8 +63,16 @@ CREATE TABLE `expense_claims` (
   `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
   `date` timestamp NOT NULL DEFAULT current_timestamp(),
   `evidenceFile` varchar(255) NOT NULL,
-  `reciept` varchar(255) NOT NULL
+  `receipt` varchar(255) NOT NULL,
+  `currency` varchar(5) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `expense_claims`
+--
+
+INSERT INTO `expense_claims` (`claimId`, `employeeId`, `amount`, `description`, `category`, `status`, `date`, `evidenceFile`, `receipt`, `currency`) VALUES
+(13, 7, 34.56, 'food', 'Food', 'Pending', '2025-03-22 18:36:10', 'uploads/67df031a15369_drizzle-background.jpg', '', 'GBP');
 
 -- --------------------------------------------------------
 
@@ -74,7 +81,7 @@ CREATE TABLE `expense_claims` (
 --
 
 CREATE TABLE `managers` (
-  `managerID` int(11) NOT NULL,
+  `managerId` int(11) NOT NULL,
   `spendingLimit` decimal(10,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -82,7 +89,7 @@ CREATE TABLE `managers` (
 -- Dumping data for table `managers`
 --
 
-INSERT INTO `managers` (`managerID`, `spendingLimit`) VALUES
+INSERT INTO `managers` (`managerId`, `spendingLimit`) VALUES
 (3, 10000.00);
 
 --
@@ -109,7 +116,7 @@ ALTER TABLE `expense_claims`
 -- Indexes for table `managers`
 --
 ALTER TABLE `managers`
-  ADD PRIMARY KEY (`managerID`);
+  ADD PRIMARY KEY (`managerId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -125,7 +132,7 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `expense_claims`
 --
 ALTER TABLE `expense_claims`
-  MODIFY `claimId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `claimId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables

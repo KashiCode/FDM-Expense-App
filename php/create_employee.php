@@ -15,10 +15,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $employee = new Employee();
     if ($employee->createEmployee($firstName, $lastName, $email, $role, $username, $password, $manager)) {
         $message = "Employee created successfully!";
+        header("Location: create_employee.php");
+        exit();
     } else {
         $message = "Error creating employee.";
     }
 }
+
+$conn = DatabaseManager::getInstance()->getConnection();
+
+$sql = "SELECT e.employeeId, e.firstName, e.lastName 
+        FROM employees e 
+        INNER JOIN managers m ON e.employeeId = m.managerId";
+
+$stmt = $conn->prepare($sql);
+$stmt->execute();
 ?>
 
 <!DOCTYPE html>
@@ -59,8 +70,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="password">Password:</label>
         <input type="password" name="password" required>
         
-        <label for="manager">Manager ID:</label>
-        <input type="number" name="manager" required>
+        <label for="manager">Manager:</label>
+        <select name="manager" required>
+            <option value="">None</option>
+            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+                <option value="<?php echo $row['employeeId']; ?>">
+                    <?php echo $row['firstName'] . " " . $row['lastName']; ?>
+                </option>
+            <?php endwhile; ?>
+        </select> 
 
         <button type="submit">Create Employee</button>
     </form>
