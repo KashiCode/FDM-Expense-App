@@ -76,10 +76,10 @@
 
                         if ($claim['status'] == 'Pending') {
                             echo "<div class='badges'> <button class='blue'>Approval Required</button> </div>";
-                            echo "<button>Accept Claim</button> <button>Reject Claim</button> <button>View Claim</button>";
+                            echo "<button>Accept Claim</button> <button>Reject Claim</button> <button onclick=\"window.location.href='view_claim.php?id=" . $claim['claimId'] . "'\">View Claim</button>";
                         } else if ($claim['status'] == 'Rejected') {
                             echo "<div class='badges'> <button class='red'>Rejected</button> </div>";
-                            echo "<button>View Claim</button>";
+                            echo "<button onclick=\"window.location.href='view_claim.php?id=" . $claim['claimId'] . "'\">View Claim</button>";
                         }
                         echo "</div>";
                     }
