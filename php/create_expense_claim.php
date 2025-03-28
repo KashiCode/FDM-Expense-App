@@ -72,6 +72,8 @@ if (isset($_SESSION["message"])) {
 <body>
     <h1>Create Expense Claim</h1>
 
+ 
+
     <?php if ($message): ?>
         <p id="signUpMessage"><?php echo $message; ?></p>
     <?php endif; ?>
@@ -108,5 +110,13 @@ if (isset($_SESSION["message"])) {
 
         <button type="submit">Submit Claim</button>
     </form>
+
+    <p>
+        
+    </p>
+    <div class="home-button">
+    <a href="employee_dashboard.php">Homepage</a>
+</div>
+
 </body>
 </html>
