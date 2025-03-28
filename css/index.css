@@ -677,3 +677,23 @@ input[type="reset"] {
 input[type="submit"]:hover {
     background-color: #374151;
 }
+
+/* Homepage button styling (create claim etc) */
+
+
+
+.home-button {
+    display: flex;
+    justify-content: center; 
+    margin-bottom: 20px;
+}
+
+
+.home-button a {
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #1F2937;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
