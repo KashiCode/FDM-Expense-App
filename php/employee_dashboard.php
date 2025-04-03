@@ -63,7 +63,6 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <br>
 
-           
             <?php if (count($claims) === 0): ?>
                 <p style="text-align:center; font-style: italic;">No prior claims submitted.</p>
             <?php else: ?>
@@ -84,11 +83,23 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </a>
                         <?php endif; ?>
 
-
-                        <!-- Dyanamic buttons that update based on the value of the status row in the database table -->
+                        <!-- Dynamic buttons based on the claim status -->
                         <?php if ($claim['status'] === 'Pending'): ?>
-                            <button>Edit Claim</button>
-                            <button>Delete Claim</button>
+                            <!-- Edit Claim button triggers a GET request with claimId -->
+                            <form method="GET" action="update_claim.php" style="display:inline;">
+                                <input type="hidden" name="claimId" value="<?= $claim['claimId'] ?>">
+                                <button type="submit">Edit Claim</button>
+                            </form>
+                            <form method="POST" action="delete_claim.php" style="display:inline;" onsubmit="return confirmDelete()">
+                                <input type="hidden" name="claimId" value="<?= $claim['claimId'] ?>">
+                                <button type="submit">Delete Claim</button>
+                            </form>
+
+                            <script>
+                                function confirmDelete() {
+                                    return confirm("Are you sure you want to delete this claim?");
+                                }
+                            </script>
                         <?php elseif ($claim['status'] === 'Rejected'): ?>
                             <button>View Response</button>
                         <?php endif; ?>
@@ -105,4 +116,3 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </body>
 </html>
-

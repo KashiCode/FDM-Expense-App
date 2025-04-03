@@ -4,7 +4,8 @@ require_once "models/ExpenseClaim.php";
 
 // Ensure the user is logged in
 if (!isset($_SESSION["employeeId"])) {
-    header("Location: ../login.html");;
+    header("Location: ../login.html");
+    exit();
 }
 
 $message = "";
@@ -36,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $claim = new ExpenseClaim();
     if ($claim->createClaim($employeeId, $amount, $description, $category, $evidenceFile, "", $currency)) {
         $_SESSION["message"] = "Expense claim submitted successfully!";
-        header("Location: create_expense_claim.php"); // Redirect to clear the form
+        header("Location: employee_dashboard.php"); // Redirect to homepage
         exit();
     } else {
         $message = "Error submitting claim.";
@@ -72,14 +73,12 @@ if (isset($_SESSION["message"])) {
 <body>
     <h1>Create Expense Claim</h1>
 
- 
-
     <?php if ($message): ?>
         <p id="signUpMessage"><?php echo $message; ?></p>
     <?php endif; ?>
 
     <form method="post" action="" enctype="multipart/form-data">
-    <label for="amount">Amount:</label>
+        <label for="amount">Amount:</label>
         <div class="currecy-amount">
             <select id="currency" name="currency" required>
                 <option value="USD">USD</option>
@@ -103,7 +102,7 @@ if (isset($_SESSION["message"])) {
 
         <label for="evidenceFile">Upload Evidence:</label>
         <label class="file-upload" for="image">
-            <input type="file" id="image" name="evidenceFile" accept="image/*" onchange="previewImage(event)" required>
+            <input type="file" id="image" name="evidenceFile" accept="image/*" onchange="previewImage(event)">
             Choose Image
         </label>
         <img id="imagePreview" src="" style="display:none; max-width: 300px; margin-top: 10px;">
@@ -112,11 +111,10 @@ if (isset($_SESSION["message"])) {
     </form>
 
     <p>
-        
     </p>
     <div class="home-button">
-    <a href="employee_dashboard.php">Homepage</a>
-</div>
+        <a href="employee_dashboard.php">Homepage</a>
+    </div>
 
 </body>
 </html>
