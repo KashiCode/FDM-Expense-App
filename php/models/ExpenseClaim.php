@@ -23,7 +23,6 @@ class ExpenseClaim {
         $stmt->bindParam(':category', $category);
         $stmt->bindParam(':evidenceFile', $evidenceFile);
         // $stmt->bindParam(':receipt', $receipt);
-        // $stmt->bindValue(':receipt', null, PDO::PARAM_NULL);
         $stmt->bindParam(':currency', $currency);
         
         return $stmt->execute();
