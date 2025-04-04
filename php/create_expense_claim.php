@@ -36,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Create the expense claim
     $claim = new ExpenseClaim();
     if ($claim->createClaim($employeeId, $amount, $description, $category, $evidenceFile, "", $currency)) {
-        $_SESSION["message"] = "Expense claim submitted successfully!";
         header("Location: employee_dashboard.php"); // Redirect to homepage
         exit();
     } else {
@@ -98,6 +97,7 @@ if (isset($_SESSION["message"])) {
             <option value="Food">Food</option>
             <option value="Office Supplies">Office Supplies</option>
             <option value="Accommodation">Accommodation</option>
+            <option value="Fuel">Fuel</option>
         </select>
 
         <label for="evidenceFile">Upload Evidence:</label>

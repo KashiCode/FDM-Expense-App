@@ -13,8 +13,8 @@ class ExpenseClaim {
     // Create a new expense claim
     public function createClaim($employeeId, $amount, $description, $category, $evidenceFile, $receipt, $currency) {
 
-        $sql = "INSERT INTO expense_claims (employeeId, amount, description, category, evidenceFile, receipt, currency) 
-                VALUES (:employeeId, :amount, :description, :category, :evidenceFile, :receipt, :currency)";
+        $sql = "INSERT INTO expense_claims (employeeId, amount, description, category, evidenceFile, currency) 
+                VALUES (:employeeId, :amount, :description, :category, :evidenceFile, :currency)";
         
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(':employeeId', $employeeId);
@@ -23,6 +23,7 @@ class ExpenseClaim {
         $stmt->bindParam(':category', $category);
         $stmt->bindParam(':evidenceFile', $evidenceFile);
         // $stmt->bindParam(':receipt', $receipt);
+        // $stmt->bindValue(':receipt', null, PDO::PARAM_NULL);
         $stmt->bindParam(':currency', $currency);
         
         return $stmt->execute();
