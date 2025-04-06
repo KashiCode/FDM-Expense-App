@@ -7,12 +7,6 @@ class Manager extends Employee {
         parent::__construct(); // Call Employee constructor to get DB connection
     }
 
-
-    // TODO: Implement approveClaim method
-    // TODO: Implement rejectClaim method
-    // TODO: Implement requestMoreInfo method
-    // TODO: Implement searchEmployeeClaims method
-
     // Get the manager's team (list of employees under them)
     public function getTeam($managerId) {
         $sql = "SELECT * FROM employees WHERE manager = :managerId";

@@ -22,9 +22,5 @@ class Finance extends Employee {
         $this->role = $data['role'];
         $this->username = $data['username'];
     }
-
-    // TODO: Implement processReimbursement method
-    // TODO: Implement generateReport method
-    // TODO: Implement searchEmployee method
 }
 ?>

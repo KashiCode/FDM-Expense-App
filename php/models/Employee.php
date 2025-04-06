@@ -24,12 +24,5 @@ class Employee {
         
         return $stmt->execute();
     }
-
-    // TODO: Implement the createClaim function
-    // TODO: Implement the uploadClaimEvidence function (might not need it)
-    // TODO: Implement the viewClaim function
-    // TODO: Implement the editClaim function
-    // TODO: Implement the deleteClaim function
-    // TODO: Implement the searchClaim function
 }
 ?>
