@@ -62,9 +62,67 @@
                 <div class="badges">
                     <button class="green">Approved</button>
                 </div>
-        </div>
+            </div>
+
+            <div class="report">
+                <h4>Test Reimbursement Form</h4>
+                <form onsubmit="return processReimbursement(event)">
+                    <label for="claimId">Claim ID:</label>
+                    <input type="number" name="claimId" required><br><br>
+
+                    <label for="status">Status:</label>
+                    <select name="status">
+                        <option value="Approved">Approve</option>
+                        <option value="Rejected">Reject</option>
+                    </select><br><br>
+
+                    <label for="note">Note:</label>
+                    <input type="text" name="note" placeholder="Optional note"><br><br>
+
+                    <button type="submit">Submit Reimbursement</button>
+                </form>
+            </div>
+
         </section>
     </div>
+    <script>
+        function processReimbursement(event) {
+            event.preventDefault();
+            const form = event.target;
+            const claimId = form.claimId.value;
+            const status = form.status.value;
+            const note = form.note.value;
+
+            fetch('../php/finance_actions.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    claimId: 123,
+                    amount: 50.00
+                })
+            })
+            .then(response => {
+                // Check if response is valid JSON
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error("Invalid JSON response: " + text);
+                    });
+                }
+            })
+            .then(data => {
+                console.log("Server Response:", data);
+            })
+            .catch(error => {
+                console.error("Fetch error:", error.message);
+            });
+        }
+    </script>
+
 </body>
 </html>
 
