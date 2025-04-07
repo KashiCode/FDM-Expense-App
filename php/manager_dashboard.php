@@ -62,14 +62,32 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </nav>
     <br>
 
-    <!-- Account Alert -->
-    <section class="active-alerts">
-        <h3>⚠️ Account Alert ⚠️</h3>
-        <div class="report">
-            <h4>New Claim Added</h4>
-            <p>[Summary of claim]</p>
-        </div>
-    </section>
+    <?php
+    $sql = "SELECT expense_claims.*, employees.firstName, employees.lastName 
+        FROM expense_claims 
+        INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
+        WHERE expense_claims.date < (SELECT loggedIn FROM employees WHERE employeeId = :employeeId) 
+        AND expense_claims.status = 'Pending' 
+        ORDER BY expense_claims.date DESC LIMIT 1";
+    $params = [':employeeId' => $_SESSION['employeeId']];
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
+    $alertclaims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (!empty($alertclaims)) {
+        echo '<section class="active-alerts">
+                <h3>⚠️ Account Alert ⚠️</h3>';
+        foreach ($alertclaims as $alert) {
+            echo '<div class="report">
+                    <h4>New Claim Added</h4>
+                    <p>Employee: ' . htmlspecialchars($alert['firstName'] . ' ' . $alert['lastName']) . ', Amount: ' . htmlspecialchars($alert['currency'] . ' ' . $alert['amount']) . '</p>
+                  </div>';
+        }
+        echo '</section>';
+    }
+    
+    ?>
+
 
     <!-- Claim Filter + Results -->
     <section class="weather-map">
