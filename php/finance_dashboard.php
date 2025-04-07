@@ -1,128 +1,170 @@
+<?php
+session_start();
+if (!isset($_SESSION['employeeId']) || $_SESSION['role'] !== 'Finance') {
+    header("Location: ../login.html");
+    exit();
+}
+
+require_once "models/DatabaseManager.php";
+$conn = DatabaseManager::getInstance()->getConnection();
+
+$sql = "SELECT expense_claims.*, employees.firstName, employees.lastName 
+        FROM expense_claims 
+        INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
+        WHERE status != 'Reimbursed'";
+
+$params = [];
+
+if (!empty($_GET['date'])) {
+    $sql .= " AND DATE(date) = :date";
+    $params[':date'] = $_GET['date'];
+}
+if (!empty($_GET['category'])) {
+    $sql .= " AND category LIKE :category";
+    $params[':category'] = '%' . $_GET['category'] . '%';
+}
+if (!empty($_GET['amount'])) {
+    $sql .= " AND amount = :amount";
+    $params[':amount'] = $_GET['amount'];
+}
+if (!empty($_GET['status'])) {
+    $sql .= " AND status = :status";
+    $params[':status'] = $_GET['status'];
+} else {
+    $sql .= " AND status != 'Reimbursed'";
+}
+
+
+$sql .= " ORDER BY date DESC";
+$stmt = $conn->prepare($sql);
+$stmt->execute($params);
+$claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FDM Expense App</title>
-    <link rel="stylesheet" href="../css/style.css">
-
+  <meta charset="UTF-8">
+  <title>Finance Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Navbar -->
-        <nav class="navbar">
-            <div class="logo">FDM Expense App</div>
-            <div class="nav-links">
-                <button class="Btn">
-                    <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
-                    <div class="text">Logout</div>
-                  </button>
-                  
-                  
-            </div>
-        </nav>
-        <br>
-
-        <!-- User Alerts -->
-        <section class="active-alerts">
-            <h3>⚠️ Account Alert ⚠️</h3>
-            <div class="report">
-                <h4>Claim Update</span></h4>
-                <p>[Placeholder for updates to your claims]</p>
-            </div>
-        </section>
-
-        <section class="weather-map">
-            <h3>View Claims</h3>
-            <div class="tabs">
-                <button onclick="window.location.href='create_expense_claim.php';">Create Claim</button>
-            </div>
-            <br>
-            <div class="report">
-                <h4>Claim 1 </span></h4> 
-                <br>
-                <button>Delete Claim</button> <button>Edit Claim</button>
-                <div class="badges">
-                    <button class="yellow">InProgress</button>
-                </div>
-            </div>
-                <div class="report">
-                    <h4>Claim 2 </span></h4> 
-                    <br>
-                    <button>View Response</button>
-                    <div class="badges">
-                        <button class="red">Rejected</button>
-                    </div>
-            </div>
-
-            <div class="report">
-                <h4>Claim 3 </span></h4> 
-                <br>
-                <button>Delete Claim</button> 
-                <div class="badges">
-                    <button class="green">Approved</button>
-                </div>
-            </div>
-
-            <div class="report">
-                <h4>Test Reimbursement Form</h4>
-                <form onsubmit="return processReimbursement(event)">
-                    <label for="claimId">Claim ID:</label>
-                    <input type="number" name="claimId" required><br><br>
-
-                    <label for="status">Status:</label>
-                    <select name="status">
-                        <option value="Approved">Approve</option>
-                        <option value="Rejected">Reject</option>
-                    </select><br><br>
-
-                    <label for="note">Note:</label>
-                    <input type="text" name="note" placeholder="Optional note"><br><br>
-
-                    <button type="submit">Submit Reimbursement</button>
-                </form>
-            </div>
-
-        </section>
+<div class="container">
+  <nav class="navbar">
+    <div class="logo">FDM Expense App - Finance</div>
+    <div class="nav-links">
+      <form method="POST" action="../php/logout.php">
+        <button class="Btn" type="submit">Logout</button>
+      </form>
     </div>
-    <script>
-        function processReimbursement(event) {
-            event.preventDefault();
-            const form = event.target;
-            const claimId = form.claimId.value;
-            const status = form.status.value;
-            const note = form.note.value;
+  </nav>
 
-            fetch('../php/finance_actions.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    claimId: 123,
-                    amount: 50.00
-                })
-            })
-            .then(response => {
-                // Check if response is valid JSON
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    return response.json();
-                } else {
-                    return response.text().then(text => {
-                        throw new Error("Invalid JSON response: " + text);
-                    });
-                }
-            })
-            .then(data => {
-                console.log("Server Response:", data);
-            })
-            .catch(error => {
-                console.error("Fetch error:", error.message);
-            });
-        }
-    </script>
+  <section class="active-alerts">
+    <h3>📋 All Claims (Finance View)</h3>
+    <form method="GET">
+      <label>Status:</label>
+      <select name="status">
+        <option value="">All</option>
+        <option value="Pending" <?= ($_GET['status'] ?? '') == 'Pending' ? 'selected' : '' ?>>Pending</option>
+        <option value="Approved" <?= ($_GET['status'] ?? '') == 'Approved' ? 'selected' : '' ?>>Approved</option>
+        <option value="Rejected" <?= ($_GET['status'] ?? '') == 'Rejected' ? 'selected' : '' ?>>Rejected</option>
+        <option value="Reimbursed" <?= ($_GET['status'] ?? '') == 'Reimbursed' ? 'selected' : '' ?>>Reimbursed</option>
+      </select>
 
+      <label>Date:</label>
+      <input type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>">
+
+      <label>Category:</label>
+      <select name="category">
+        <option value="">All</option>
+        <option value="Food">Food</option>
+        <option value="Travel">Travel</option>
+        <option value="Office Supplies">Office Supplies</option>
+        <option value="Accommodation">Accommodation</option>
+        <option value="Fuel">Fuel</option>
+      </select>
+
+      <label>Amount:</label>
+      <input type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>">
+
+      <button type="submit">Apply Filters</button>
+      <a href="finance_dashboard.php"><button type="button">Reset</button></a>
+    </form>
+  </section>
+
+  <section class="weather-map">
+    <?php if (empty($claims)): ?>
+      <p>No matching claims.</p>
+    <?php else: ?>
+      <?php foreach ($claims as $claim): ?>
+        <div class="report" id="claim-<?= $claim['claimId'] ?>">
+          <h4>Claim #<?= $claim['claimId'] ?></h4>
+          <p><strong>Employee:</strong> <?= $claim['firstName'] . ' ' . $claim['lastName'] ?></p>
+          <p><strong>Amount:</strong> <?= $claim['currency'] . ' ' . number_format($claim['amount'], 2) ?></p>
+          <p><strong>Date:</strong> <?= date("d/m/Y", strtotime($claim['date'])) ?></p>
+          <p><strong>Description:</strong> <?= htmlspecialchars($claim['description']) ?></p>
+
+          <?php if (!empty($claim['evidenceFile']) && file_exists($claim['evidenceFile'])): ?>
+            <p><strong>Evidence:</strong></p>
+            <a href="<?= $claim['evidenceFile'] ?>" target="_blank">
+              <img src="<?= $claim['evidenceFile'] ?>" alt="Evidence" style="max-width: 150px;">
+            </a>
+          <?php endif; ?>
+
+          <br>
+          <?php if ($claim['status'] == 'Pending'): ?>
+            <div class="badges"><button class="blue">Pending Approval</button></div>
+            <button onclick="approveClaim(<?= $claim['claimId'] ?>)">Approve</button>
+            <button onclick="rejectClaim(<?= $claim['claimId'] ?>)">Reject</button>
+          <?php elseif ($claim['status'] == 'Approved'): ?>
+            <div class="badges"><button class="green">Approved</button></div>
+            <button onclick="markAsReimbursed(<?= $claim['claimId'] ?>, <?= $claim['amount'] ?>)">💸 Mark as Reimbursed</button>
+          <?php elseif ($claim['status'] == 'Rejected'): ?>
+            <div class="badges"><button class="red">Rejected</button></div>
+          <?php elseif ($claim['status'] == 'Reimbursed'): ?>
+            <div class="badges"><button class="purple">Reimbursed</button></div>
+          <?php endif; ?>
+
+          <button onclick="window.location.href='view_claim.php?id=<?= $claim['claimId'] ?>'">🔍 View Details</button>
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </section>
+
+  <section style="margin-top: 40px;">
+    <h3>📄 Generate Report</h3>
+    <form method="POST" action="../php/generate_report.php" target="_blank">
+      <button type="submit">Download Reimbursed Claims (PDF)</button>
+    </form>
+  </section>
+</div>
+
+<script>
+function markAsReimbursed(claimId, amount) {
+  fetch('../php/finance_actions.php', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ claimId, amount })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    location.reload();
+  });
+}
+
+function approveClaim(claimId) {
+  if (confirm("Approve claim #" + claimId + "?")) {
+    fetch('../php/approve_claim.php?id=' + claimId)
+      .then(() => location.reload());
+  }
+}
+
+function rejectClaim(claimId) {
+  if (confirm("Reject claim #" + claimId + "?")) {
+    fetch('../php/reject_claim.php?id=' + claimId)
+      .then(() => location.reload());
+  }
+}
+</script>
 </body>
 </html>
-
