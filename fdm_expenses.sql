@@ -205,6 +205,25 @@ ALTER TABLE `expense_claims`
 --
 ALTER TABLE `managers`
   ADD CONSTRAINT `managers_ibfk_1` FOREIGN KEY (`managerID`) REFERENCES `employees` (`employeeId`) ON DELETE CASCADE;
+
+-- --------------------------------------------------------
+--
+-- Table structure for table `sys_log` 
+-- Table that holds all system logs (logins,logouts,newclaims etc)
+--
+
+CREATE TABLE `sys_log` (
+  `logId` INT(11) NOT NULL AUTO_INCREMENT,
+  `employeeId` INT(11) NOT NULL,
+  `username` VARCHAR(50) NOT NULL,
+  `role` ENUM('Employee','Manager','Finance') NOT NULL,
+  `event` VARCHAR(255) NOT NULL,
+  `eventTime` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`logId`),
+  FOREIGN KEY (`employeeId`) REFERENCES `employees`(`employeeId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
