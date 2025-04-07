@@ -1,13 +1,10 @@
 <?php
 session_start();
-if (!isset($_SESSION['employeeId'])) {
+if (!isset($_SESSION['employeeId']) || !in_array($_SESSION['role'], ['Manager', 'Finance'])) {
     header("Location: ../login.html");
     exit();
 }
-if ($_SESSION['role'] != 'Manager') {
-    header("Location: ../login.html");
-    exit();
-}
+
 require_once "models/DatabaseManager.php";
 
 if (!isset($_GET['id'])) {
@@ -16,29 +13,22 @@ if (!isset($_GET['id'])) {
 }
 
 $conn = DatabaseManager::getInstance()->getConnection();
-$id = $_GET['id'];
+$claimId = $_GET['id'];
+
 $sql = "SELECT expense_claims.*, employees.firstName, employees.lastName 
         FROM expense_claims 
         INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
-        WHERE employees.manager = :managerId AND expense_claims.claimId = :claimId;"; // Use :claimId
-
+        WHERE expense_claims.claimId = :claimId";
 $stmt = $conn->prepare($sql);
-$stmt->bindParam(':managerId', $_SESSION['employeeId'], PDO::PARAM_INT);
-$stmt->bindParam(':claimId', $id, PDO::PARAM_INT); // Bind $id
+$stmt->bindParam(':claimId', $claimId, PDO::PARAM_INT);
 $stmt->execute();
 
-if ($stmt->rowCount() > 0) {
-    $claim = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $claim = $claim[0]; // Access the first row
-} else {
-    $claim = null; // Set $claim to null if no results are found
-}
+$claim = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Claim</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -47,47 +37,50 @@ if ($stmt->rowCount() > 0) {
         <nav class="navbar">
             <div class="logo">FDM Expense App</div>
             <div class="nav-links">
-                <button class="Btn">
-                    <div class="sign"><svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg></div>
-                    <div class="text">Logout</div>
-                </button>
+                <form method="POST" action="../php/logout.php">
+                    <button class="Btn" type="submit">
+                        <div class="text">Logout</div>
+                    </button>
+                </form>
             </div>
         </nav>
         <br>
         <section class="weather-map">
-            <?php
-            if ($claim) { // Check if $claim exists
-                echo "<h1 style='text-align:center;'>📝 Claim " . $claim['claimId'] . "</h1>";
-                echo "<div class='report' style='text-align: center;'>";
-                echo "<h4>Employee: " . $claim['firstName'] . " " . $claim['lastName'] . "</h4>";
-                echo "<h3>Amount: " . $claim['currency'] . " " . $claim['amount'] . "</h3>";
-                echo "<p>" . $claim['description'] . "</p>";
-                echo "<br>";
-                echo "<h3>Evidence:</h3>";
-                echo "<img src='" . $claim['evidenceFile'] . "' alt='Claim Evidence' style='width: 60%; border-radius: 10px; margin: 10px;'>";
-                if ($claim['status'] == 'Pending') {
-                    echo "<div class='badges'> <button class='blue'>Approval Required</button> </div>";
-                    echo "<br>";
+            <?php if ($claim): ?>
+                <h1 style='text-align:center;'>📝 Claim #<?= $claim['claimId'] ?></h1>
+                <div class='report' style='text-align: center;'>
+                    <h4>Employee: <?= htmlspecialchars($claim['firstName'] . ' ' . $claim['lastName']) ?></h4>
+                    <h3>Amount: <?= $claim['currency'] . ' ' . number_format($claim['amount'], 2) ?></h3>
+                    <p><strong>Date Submitted:</strong> <?= date("d/m/Y", strtotime($claim['date'])) ?></p>
+                    <p><strong>Category:</strong> <?= htmlspecialchars($claim['category']) ?></p>
+                    <p><strong>Description:</strong> <?= htmlspecialchars($claim['description']) ?></p>
 
-                    echo "<form method='POST' action='../php/process_claim.php' style='display: inline;'>";
-                    echo "<input type='hidden' name='claimId' value='" . $claim['claimId'] . "'>";
-                    echo "<input type='hidden' name='action' value='approve'>";
-                    echo "<button type='submit' class='confirm-button' data-action='approve'>Accept Claim</button>";
-                    echo "</form>";
+                    <?php if (!empty($claim['evidenceFile']) && file_exists($claim['evidenceFile'])): ?>
+                        <h3>Evidence:</h3>
+                        <img src="<?= $claim['evidenceFile'] ?>" alt="Claim Evidence" style="width: 60%; border-radius: 10px; margin: 10px;">
+                    <?php endif; ?>
 
-                    echo "<form method='POST' action='../php/process_claim.php' style='display: inline;'>";
-                    echo "<input type='hidden' name='claimId' value='" . $claim['claimId'] . "'>";
-                    echo "<input type='hidden' name='action' value='reject'>";
-                    echo "<button type='submit' class='confirm-button' data-action='reject'>Reject Claim</button>";
-                    echo "</form>";
-                } else if ($claim['status'] == 'Rejected') {
-                    echo "<div class='badges'> <button class='red'>Rejected</button> </div>";
-                }
-                echo "</div>";
-            } else {
-                echo "<p>Claim not found or you do not have permission to view it.</p>";
-            }
-            ?>
+                    <br>
+
+                    <?php if ($claim['status'] === 'Pending'): ?>
+                        <div class='badges'><button class='blue'>Pending Approval</button></div><br>
+                        <a href='approve_claim.php?id=<?= $claim['claimId'] ?>'>
+                            <button style='margin-right: 10px;'>Accept Claim</button>
+                        </a>
+                        <a href='reject_claim.php?id=<?= $claim['claimId'] ?>'>
+                            <button>Reject Claim</button>
+                        </a>
+                    <?php elseif ($claim['status'] === 'Rejected'): ?>
+                        <div class='badges'><button class='red'>Rejected</button></div>
+                    <?php elseif ($claim['status'] === 'Approved'): ?>
+                        <div class='badges'><button class='green'>Approved</button></div>
+                    <?php elseif ($claim['status'] === 'Reimbursed'): ?>
+                        <div class='badges'><button class='purple'>Reimbursed</button></div>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <p style="text-align:center;">Claim not found or you do not have permission to view it.</p>
+            <?php endif; ?>
         </section>
     </div>
 

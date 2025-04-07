@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json'); // Ensures JSON is sent
 require_once __DIR__ . "/models/Finance.php";
+require_once __DIR__ . "/models/DatabaseManager.php";
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["success" => false, "message" => "Invalid request method."]);
@@ -15,6 +16,13 @@ if (!isset($data['claimId'], $data['amount'])) {
 }
 
 try {
+    $conn = DatabaseManager::getInstance()->getConnection();
+
+    // here i am updating the claim statuses to reimbursed
+    $sql = "UPDATE expense_claims SET status = 'Reiumbursed' WHERE claimId = :claimId AND status = 'Approved'";
+    $statement = $conn ->prepare($sql);
+    $statement -> execute([':claimId' => $data['claimId']]);
+
     echo json_encode([
         "success" => true,
         "message" => "Reimbursement processed.",
