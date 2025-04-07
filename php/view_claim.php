@@ -83,5 +83,16 @@ $claim = $stmt->fetch(PDO::FETCH_ASSOC);
             <?php endif; ?>
         </section>
     </div>
+
+    <script>
+        document.querySelectorAll('.confirm-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+            const action = button.getAttribute('data-action'); // This is either approve or reject
+            if (!confirm(`Are you sure you want to ${action} this claim?`)) {
+                e.preventDefault(); // Cancel 
+            }
+            });
+        });
+    </script>
 </body>
 </html>
