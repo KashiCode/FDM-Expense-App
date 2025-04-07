@@ -163,6 +163,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <button onclick="window.location.href='view_claim.php?id=<?php echo $claim['claimId']; ?>'">View Claim</button>
                         <?php } ?>
+                        </div>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <p>No claims found.</p>
