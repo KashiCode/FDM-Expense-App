@@ -68,7 +68,18 @@ if ($stmt->rowCount() > 0) {
                 if ($claim['status'] == 'Pending') {
                     echo "<div class='badges'> <button class='blue'>Approval Required</button> </div>";
                     echo "<br>";
-                    echo "<button>Accept Claim</button> <button>Reject Claim</button>";
+
+                    echo "<form method='POST' action='../php/process_claim.php' style='display: inline;'>";
+                    echo "<input type='hidden' name='claimId' value='" . $claim['claimId'] . "'>";
+                    echo "<input type='hidden' name='action' value='approve'>";
+                    echo "<button type='submit' class='confirm-button' data-action='approve'>Accept Claim</button>";
+                    echo "</form>";
+
+                    echo "<form method='POST' action='../php/process_claim.php' style='display: inline;'>";
+                    echo "<input type='hidden' name='claimId' value='" . $claim['claimId'] . "'>";
+                    echo "<input type='hidden' name='action' value='reject'>";
+                    echo "<button type='submit' class='confirm-button' data-action='reject'>Reject Claim</button>";
+                    echo "</form>";
                 } else if ($claim['status'] == 'Rejected') {
                     echo "<div class='badges'> <button class='red'>Rejected</button> </div>";
                 }
@@ -79,5 +90,16 @@ if ($stmt->rowCount() > 0) {
             ?>
         </section>
     </div>
+
+    <script>
+        document.querySelectorAll('.confirm-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+            const action = button.getAttribute('data-action'); // This is either approve or reject
+            if (!confirm(`Are you sure you want to ${action} this claim?`)) {
+                e.preventDefault(); // Cancel 
+            }
+            });
+        });
+    </script>
 </body>
 </html>
