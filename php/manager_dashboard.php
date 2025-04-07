@@ -12,7 +12,9 @@ $conn = DatabaseManager::getInstance()->getConnection();
 $sql = "SELECT expense_claims.*, employees.firstName, employees.lastName 
         FROM expense_claims 
         INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
-        WHERE employees.manager = :managerId";
+        WHERE employees.manager = :managerId
+        AND expense_claims.status IN ('Pending', 'Approved', 'Rejected')
+        ORDER BY expense_claims.status ASC";
 $params = [':managerId' => $_SESSION['employeeId']];
 
 if (!empty($_GET['date'])) {
@@ -32,7 +34,7 @@ if (!empty($_GET['status'])) {
     $params[':status'] = $_GET['status'];
 }
 
-$sql .= " ORDER BY date DESC";
+// Removed duplicate ORDER BY clause
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
