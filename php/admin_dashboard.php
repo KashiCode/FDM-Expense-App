@@ -81,9 +81,9 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
         <div class="tabs">
             <!-- Search and Filter Form -->
             <form method="GET" action="admin_dashboard.php" style="display: inline;">
-                <input type="text" name="search" placeholder="Search by username or first name..." value="<?= htmlspecialchars($searchTerm) ?>">
+                <input id="filter-text" type="text" name="search" placeholder="Search by username or first name..." value="<?= htmlspecialchars($searchTerm) ?>">
 
-                <select name="role">
+                <select id="filter-select" name="role">
                     <option value="">All Roles</option>
                     <?php foreach ($roles as $role): ?>
                         <option value="<?= $role ?>" <?= ($roleFilter === $role) ? 'selected' : '' ?>>
@@ -115,7 +115,7 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
                     </h4>
                     <p>Email: <?= htmlspecialchars($user['email']) ?></p>
                     <p>Username: <?= htmlspecialchars($user['username']) ?></p>
-
+                    <br>
                     <!-- Delete Button -->
                     <form method="POST" action="delete_user.php" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
                         <input type="hidden" name="employeeId" value="<?= $user['employeeId'] ?>">

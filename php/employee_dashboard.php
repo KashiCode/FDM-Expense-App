@@ -97,8 +97,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <section class="weather-map">
             <h3>View Claims</h3>
             <form method="GET" action="">
-                <input type="date" name="date" value="<?= $_GET['date'] ?? '' ?>">
-                <select name="category">
+                <input id="filter-date" type="date" name="date" value="<?= $_GET['date'] ?? '' ?>">
+                <select id="filter-select" name="category">
                     <option value="">All Categories</option>
                     <option value="Travel" <?= ($_GET['category'] ?? '') === 'Travel' ? 'selected' : '' ?>>Travel</option>
                     <option value="Food" <?= ($_GET['category'] ?? '') === 'Food' ? 'selected' : '' ?>>Food</option>
@@ -106,8 +106,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <option value="Accommodation" <?= ($_GET['category'] ?? '') === 'Accommodation' ? 'selected' : '' ?>>Accommodation</option>
                     <option value="Fuel" <?= ($_GET['category'] ?? '') === 'Fuel' ? 'selected' : '' ?>>Fuel</option>
                 </select>
-                <input type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>" placeholder="Enter Amount">
-                <select name="status">
+                <input id="filter-text" type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>" placeholder="Enter Amount">
+                <select id="filter-select" name="status">
                     <option value="Pending" <?= ($status === 'Pending') ? 'selected' : '' ?>>Pending</option>
                     <option value="Approved" <?= ($status === 'Approved') ? 'selected' : '' ?>>Approved</option>
                     <option value="Rejected" <?= ($status === 'Rejected') ? 'selected' : '' ?>>Rejected</option>

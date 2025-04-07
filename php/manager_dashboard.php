@@ -103,7 +103,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Filter Form -->
         <form method="GET">
             <label for="status">Status:</label>
-            <select name="status" id="status">
+            <select id="filter-select" name="status" id="status">
                 <option value="">All</option>
                 <option value="Pending" <?= ($_GET['status'] ?? '') == 'Pending' ? 'selected' : '' ?>>Pending</option>
                 <option value="Approved" <?= ($_GET['status'] ?? '') == 'Approved' ? 'selected' : '' ?>>Approved</option>
@@ -111,10 +111,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </select>
 
             <label for="date">Date:</label>
-            <input type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>">
+            <input id="filter-date" type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>">
 
             <label for="category">Category:</label>
-            <select name="category">
+            <select id="filter-select" name="category">
                     <option value="">All Categories</option>
                     <option value="Travel" <?= ($_GET['category'] ?? '') === 'Travel' ? 'selected' : '' ?>>Travel</option>
                     <option value="Food" <?= ($_GET['category'] ?? '') === 'Food' ? 'selected' : '' ?>>Food</option>
@@ -123,7 +123,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <option value="Fuel" <?= ($_GET['category'] ?? '') === 'Fuel' ? 'selected' : '' ?>>Fuel</option>
                 </select>
             <label for="amount">Amount:</label>
-            <input type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>" placeholder="Enter Amount">
+            <input id="filter-text" type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>" placeholder="Enter Amount">
 
             <button type="submit">Apply Filters</button>
             <a href="manager_dashboard.php"><button type="button">Reset</button></a>

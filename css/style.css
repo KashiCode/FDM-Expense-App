@@ -34,7 +34,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 10;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -181,7 +181,9 @@ button:hover {
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
     background-color: rgb(255, 65, 65);
     padding: 0 8px; 
-    margin-left: 2100px;
+    position: fixed;
+    right: 20px;
+    transform: translateY(-50%);
   }
   /*Styles for logout button */
   button {
@@ -229,7 +231,7 @@ button:hover {
 
  /*Styles for logout button */
   .Btn:hover {
-    width: 125px;
+    width: 6em;
     border-radius: 40px;
     justify-content: flex-start; 
     padding-left: 15px; 
@@ -239,4 +241,37 @@ button:hover {
     opacity: 1;
     width: auto; 
     margin-left: 10px; 
+  }
+
+  #filter-text{
+    background-color: #1D2837;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    color: #FFF;
+    font-family: Inter;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  
+  #filter-select{
+    background-color: #1D2837;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    color: #FFF;
+    font-family: Inter;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  #filter-select:hover{
+    background: #374151;
+  }
+
+  #filter-date{
+    background-color: #1D2837;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 5px;
+    color: #FFF;
+    font-family: Inter;
+    font-size: 20px;
+    font-weight: 500;
   }
