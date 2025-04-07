@@ -13,28 +13,33 @@ $sql = "SELECT expense_claims.*, employees.firstName, employees.lastName
         FROM expense_claims 
         INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
         WHERE employees.manager = :managerId
-        AND expense_claims.status IN ('Pending', 'Approved', 'Rejected')
-        ORDER BY expense_claims.status ASC";
+        AND expense_claims.status IN ('Pending', 'Approved', 'Rejected')";
 $params = [':managerId' => $_SESSION['employeeId']];
 
+$filters = [];
 if (!empty($_GET['date'])) {
-    $sql .= " AND DATE(date) = :date";
+    $filters[] = "DATE(date) = :date";
     $params[':date'] = $_GET['date'];
 }
 if (!empty($_GET['category'])) {
-    $sql .= " AND category LIKE :category";
+    $filters[] = "category LIKE :category";
     $params[':category'] = '%' . $_GET['category'] . '%';
 }
 if (!empty($_GET['amount'])) {
-    $sql .= " AND amount = :amount";
+    $filters[] = "amount = :amount";
     $params[':amount'] = $_GET['amount'];
 }
 if (!empty($_GET['status'])) {
-    $sql .= " AND status = :status";
+    $filters[] = "status = :status";
     $params[':status'] = $_GET['status'];
 }
 
-// Removed duplicate ORDER BY clause
+if (!empty($filters)) {
+    $sql .= " AND " . implode(" AND ", $filters);
+}
+
+$sql .= " ORDER BY expense_claims.status ASC";
+
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);

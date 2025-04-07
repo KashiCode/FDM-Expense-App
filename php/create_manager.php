@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Admin') {
+    header("Location: ../login.html");
+    exit();
+}
 require_once "models/Manager.php";
 
 $message = "";

@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Admin') {
+    header("Location: ../login.html");
+    exit();
+}
 require_once "models/DatabaseManager.php";
 
 
@@ -92,8 +96,11 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
             </form>
 
             <!-- Add User Button -->
-            <form method="GET" action="create_user.php" style="display: inline;">
-                <button type="submit">Add User</button>
+            <form method="GET" action="create_employee.php" style="display: inline;">
+                <button type="submit">Add Employee</button>
+            </form>
+            <form>
+                <button type="submit" formaction="create_manager.php">Add Manager</button>
             </form>
         </div>
         <br>
