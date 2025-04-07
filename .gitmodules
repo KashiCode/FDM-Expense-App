@@ -1,0 +1,3 @@
+[submodule "php/tcpdf"]
+	path = php/tcpdf
+	url = https://github.com/tecnickcom/TCPDF.git
