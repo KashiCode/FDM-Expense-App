@@ -2,34 +2,34 @@
 session_start();
 require_once "models/DatabaseManager.php";
 
-// Get logged-in user info
+
 $loggedInUsername = $_SESSION['username'] ?? '';
 $loggedInRole = $_SESSION['role'] ?? '';
 $loggedInId = $_SESSION['employeeId'] ?? null;
 
-// Get search and role filter inputs
+
 $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : "";
 $roleFilter = isset($_GET['role']) ? trim($_GET['role']) : "";
 
-// Build SQL
+
 $conn = DatabaseManager::getInstance()->getConnection();
 $params = [];
 $sql = "SELECT employeeId, firstName, lastName, email, role, username FROM employees WHERE 1=1";
 
-// Search filter
+
 if (!empty($searchTerm)) {
     $sql .= " AND (username LIKE ? OR firstName LIKE ?)";
     $params[] = "%" . $searchTerm . "%";
     $params[] = "%" . $searchTerm . "%";
 }
 
-// Role filter
+
 if (!empty($roleFilter)) {
     $sql .= " AND role = ?";
     $params[] = $roleFilter;
 }
 
-// Exclude logged-in admin from user list
+
 if ($loggedInRole === "Admin") {
     $sql .= " AND employeeId != ?";
     $params[] = $loggedInId;
@@ -41,7 +41,7 @@ $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Role options for filter
+
 $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
 ?>
 
