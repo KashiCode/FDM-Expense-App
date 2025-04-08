@@ -55,7 +55,7 @@ $claim = $stmt->fetch(PDO::FETCH_ASSOC);
                     <p><strong>Category:</strong> <?= htmlspecialchars($claim['category']) ?></p>
                     <p><strong>Description:</strong> <?= htmlspecialchars($claim['description']) ?></p>
                     <?php if (!empty($claim['managerMessage'])): ?>
-                            <p><strong>Rejection reason:</strong>
+                            <p><strong>Manager's note:</strong>
                             <?= htmlspecialchars($claim['managerMessage']) ?></p>
                     <?php endif; ?>
 
