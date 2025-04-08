@@ -64,6 +64,7 @@ CREATE TABLE `expense_claims` (
   `description` varchar(255) NOT NULL,
   `category` varchar(50) NOT NULL,
   `status` enum('Pending','Approved','Rejected','Reimbursed') DEFAULT 'Pending',
+  `managerMessage` varchar(500) DEFAULT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp(),
   `evidenceFile` varchar(255) NOT NULL,
   `receipt` varchar(255) NOT NULL,

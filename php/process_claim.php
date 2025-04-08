@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     $claimId = $_POST['claimId'];
     $action = $_POST['action']; // 'approve' or 'reject'
     $managerId = $_SESSION['employeeId'];
+    $managerMessage = $_POST['managerMessage'] ?? null; //If its not set, then set to null
 
     $conn = DatabaseManager::getInstance()->getConnection();
 
@@ -30,10 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
 
     // Update claim status
     $newStatus = ($action == 'approve') ? 'Approved' : 'Rejected'; //If approve, then true. true = approved, false = rejected
-    $updateSql = "UPDATE expense_claims SET status = :status WHERE claimId = :claimId";
+    $updateSql = "UPDATE expense_claims SET status = :status, managerMessage = :managerMessage WHERE claimId = :claimId";
+
     $updateStmt = $conn->prepare($updateSql);
     $updateStmt->bindParam(':status', $newStatus);
     $updateStmt->bindParam(':claimId', $claimId); //Binded for security
+    $updateStmt->bindParam(':managerMessage', $managerMessage);
     $updateStmt->execute();
 
     // Redirect back to dashboard
