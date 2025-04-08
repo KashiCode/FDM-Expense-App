@@ -4,7 +4,7 @@ require_once "models/DatabaseManager.php";
 
 // Check manager is logged in
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Manager') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit;
 }
 

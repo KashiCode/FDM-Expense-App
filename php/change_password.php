@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Admin') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 require_once "models/DatabaseManager.php";
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Failed to update password.";
         }
     } else {
-        echo "Passwords do not match.";
+        echo "<p class='error'>Passwords do not match.</p>";
     }
 }
 

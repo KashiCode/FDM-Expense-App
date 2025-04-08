@@ -499,10 +499,12 @@ figcaption {
     color: #d40606;
     font-weight: bold;
 }
-.error {
-    border: 1px solid #d40606;
+.error{
+    color: #FF0000;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 8px;
   }
-
 
 
 footer {

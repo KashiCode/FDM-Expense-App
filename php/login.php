@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Validate input
     if (empty($username) || empty($password)) {
-        echo "Username and password are required.";
+        $_SESSION["errorMessage"] = "Username and password are required.";
         exit;
     }
 
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     header("Location: finance_dashboard.php");
                     break;
                 default:
-                    echo "Invalid role. {$user['role']}";
+                    $_SESSION["errorMessage"] = "Invalid role. {$user['role']}";
                     break;
             }
             exit;
@@ -63,9 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "Invalid password.";
         }
     } else {
-        echo "User not found.";
+        $_SESSION["errorMessage"] = "User not found.";
     }
 } else {
-    echo "Invalid request method.";
+    $_SESSION["errorMessage"] = "Invalid request method.";
 }
+header("Location: ../loginPage.php");
+exit();
 ?>

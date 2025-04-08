@@ -4,7 +4,7 @@ require_once "models/DatabaseManager.php"; // Ensure this is your database manag
 
 // Ensure user is logged in
 if (!isset($_SESSION["employeeId"])) {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 

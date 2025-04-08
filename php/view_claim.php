@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || !in_array($_SESSION['role'], ['Manager', 'Finance'])) {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 
