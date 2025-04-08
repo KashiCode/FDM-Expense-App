@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <option value="JPY" <?= ($claim['currency'] == 'JPY') ? 'selected' : '' ?>>JPY</option>
                         <option value="AUD" <?= ($claim['currency'] == 'AUD') ? 'selected' : '' ?>>AUD</option>
                     </select>
-                    <input type="number" step="0.01" name="amount" value="<?= $claim['amount'] ?>" required>
+                    <input type="number" step="0.01" name="amount" value="<?= $claim['amount'] ?>" min="0.01" required>
                 </div>
                 <br>
                 <label for="description">Description:</label>
