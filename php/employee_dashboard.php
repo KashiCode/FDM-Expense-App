@@ -77,6 +77,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="report">
                     <h4>Most Recent Claim Update</h4>
                     <p><strong>Claim Status:</strong> <?= $recentClaim['status'] ?></p>
+                    <?php if (!empty($recentClaim['managerMessage'])): ?>
+                            <p><strong>Manager's response:</strong>
+                            <?= htmlspecialchars($recentClaim['managerMessage']) ?></p>
+                    <?php endif; ?>
                     <p><strong>Amount:</strong> <?= $recentClaim['currency'] ?> <?= number_format($recentClaim['amount'], 2) ?></p>
                     <p><strong>Date Submitted:</strong> <?= date("d/m/Y H:i", strtotime($recentClaim['date'])) ?></p>
                     <p><strong>Category:</strong> <?= $recentClaim['category'] ?></p>
@@ -126,6 +130,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <p><strong>Date Submitted:</strong> <?= date("d/m/Y H:i", strtotime($claim['date'])) ?></p>
                         <p><strong>Category:</strong> <?= $claim['category'] ?></p>
                         <p><strong>Description:</strong> <?= htmlspecialchars($claim['description']) ?></p>
+                        
                         <?php if (!empty($claim['evidenceFile']) && file_exists($claim['evidenceFile'])): ?>
                             <p><strong>Evidence:</strong></p>
                             <a href="<?= $claim['evidenceFile'] ?>" target="_blank">
@@ -143,7 +148,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <button type="submit">Delete Claim</button>
                             </form>
                         <?php elseif ($claim['status'] === 'Rejected'): ?>
-                            <button>View Response</button>
+                            <?php if (!empty($recentClaim['managerMessage'])): ?>
+                            <p><strong>Manager's response:</strong>
+                            <?= htmlspecialchars($recentClaim['managerMessage']) ?></p>
+                    <?php endif; ?>
                         <?php endif; ?>
                         <div class="badges">
                             <button class="<?= strtolower($claim['status']); ?>"><?= $claim['status'] ?></button>
