@@ -145,7 +145,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <section style="margin-top: 40px;">
     <h3>📄 Generate Report</h3>
-    <form method="POST" action="../php/generate_report.php" target="_blank">
+    <form method="POST" action="generate_report.php" target="_blank">
       <button type="submit">Download Reimbursed Claims (PDF)</button>
     </form>
   </section>

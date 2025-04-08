@@ -19,7 +19,7 @@ try {
     $conn = DatabaseManager::getInstance()->getConnection();
 
     // here i am updating the claim statuses to reimbursed
-    $sql = "UPDATE expense_claims SET status = 'Reiumbursed' WHERE claimId = :claimId AND status = 'Approved'";
+    $sql = "UPDATE expense_claims SET status = 'Reimbursed' WHERE claimId = :claimId AND status = 'Approved'";
     $statement = $conn ->prepare($sql);
     $statement -> execute([':claimId' => $data['claimId']]);
 
