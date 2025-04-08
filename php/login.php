@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             exit;
         } else {
-            echo "Invalid password.";
+             $_SESSION["errorMessage"] = "Invalid password.";
         }
     } else {
         $_SESSION["errorMessage"] = "User not found.";
