@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Admin') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 require_once "models/DatabaseManager.php";

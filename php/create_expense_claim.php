@@ -4,7 +4,7 @@ require_once "models/ExpenseClaim.php";
 
 // Ensure the user is logged in
 if (!isset($_SESSION["employeeId"])) {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 

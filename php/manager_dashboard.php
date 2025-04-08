@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Manager') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 require_once "models/DatabaseManager.php";
@@ -155,6 +155,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <form method='POST' action='../php/process_claim.php' style='display: inline;'>
                                 <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
                                 <input type='hidden' name='action' value='reject'>
+                                <input type='hidden' name='managerMessage' value=''>
                                 <button type='submit' class='confirm-button' data-action='reject'>Reject Claim</button>
                             </form>
 
@@ -180,10 +181,28 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <script>
         document.querySelectorAll('.confirm-button').forEach(button => {
             button.addEventListener('click', (e) => {
-            const action = button.getAttribute('data-action'); // This is either approve or reject
-            if (!confirm(`Are you sure you want to ${action} this claim?`)) {
-                e.preventDefault(); // Cancel 
-            }
+                e.preventDefault(); // Because this is done now, the return below cancels
+                const action = button.getAttribute('data-action');
+                const form = button.closest('form');
+
+                if (!confirm(`Are you sure you want to ${action} this claim?`)) {
+                    return; // Exit if user cancels
+                }
+
+                if (action === 'reject') {
+                    const managerMessage = prompt("Please provide a reason for rejection, or ask for employee elaboration (both optional):");
+                    
+                    // Only add what was typed in only if user didn't cancel the prompt
+                    if (managerMessage !== null) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'managerMessage';
+                        input.value = managerMessage;
+                        form.appendChild(input);
+                    }
+                }
+                
+                form.submit(); // Only submit text after all checks
             });
         });
     </script>

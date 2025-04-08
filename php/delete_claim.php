@@ -4,13 +4,13 @@ require_once "models/DatabaseManager.php";
 
 // Ensure the user is logged in
 if (!isset($_SESSION['employeeId'])) {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 
 // Ensure the user is an Employee
 if ($_SESSION['role'] !== 'Employee') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 

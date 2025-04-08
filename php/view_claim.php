@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || !in_array($_SESSION['role'], ['Manager', 'Finance'])) {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 
@@ -54,6 +54,10 @@ $claim = $stmt->fetch(PDO::FETCH_ASSOC);
                     <p><strong>Date Submitted:</strong> <?= date("d/m/Y", strtotime($claim['date'])) ?></p>
                     <p><strong>Category:</strong> <?= htmlspecialchars($claim['category']) ?></p>
                     <p><strong>Description:</strong> <?= htmlspecialchars($claim['description']) ?></p>
+                    <?php if (!empty($claim['managerMessage'])): ?>
+                            <p><strong>Manager's response:</strong>
+                            <?= htmlspecialchars($claim['managerMessage']) ?></p>
+                    <?php endif; ?>
 
                     <?php if (!empty($claim['evidenceFile']) && file_exists($claim['evidenceFile'])): ?>
                         <h3>Evidence:</h3>
@@ -64,19 +68,36 @@ $claim = $stmt->fetch(PDO::FETCH_ASSOC);
 
                     <?php if ($claim['status'] === 'Pending'): ?>
                         <div class='badges'><button class='blue'>Pending Approval</button></div><br>
-                        <a href='approve_claim.php?id=<?= $claim['claimId'] ?>'>
-                            <button style='margin-right: 10px;'>Accept Claim</button>
-                        </a>
-                        <a href='reject_claim.php?id=<?= $claim['claimId'] ?>'>
-                            <button>Reject Claim</button>
-                        </a>
+                        
+                        <!-- Approve Form -->
+                        <form method='POST' action='../php/process_claim.php' style='display: inline;'>
+                            <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
+                            <input type='hidden' name='action' value='approve'>
+                            <button type='submit' class='confirm-button' data-action='approve'>Approve Claim</button>
+                        </form>
+
+                        <!-- Reject Form -->
+                        <form method='POST' action='../php/process_claim.php' style='display: inline;'>
+                            <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
+                            <input type='hidden' name='action' value='reject'>
+                            <input type='hidden' name='managerMessage' value=''>
+                            <button type='submit' class='confirm-button' data-action='reject'>Reject Claim</button>
+                        </form>
+
+                        <?php if (!empty($claim['managerMessage'])): ?>
+                            <p><strong>Manager's response:</strong> <?= htmlspecialchars($claim['managerMessage']) ?></p>
+                        <?php endif; ?>
+
                     <?php elseif ($claim['status'] === 'Rejected'): ?>
                         <div class='badges'><button class='red'>Rejected</button></div>
+
                     <?php elseif ($claim['status'] === 'Approved'): ?>
                         <div class='badges'><button class='green'>Approved</button></div>
                     <?php elseif ($claim['status'] === 'Reimbursed'): ?>
                         <div class='badges'><button class='purple'>Reimbursed</button></div>
                     <?php endif; ?>
+
+                
                 </div>
             <?php else: ?>
                 <p style="text-align:center;">Claim not found or you do not have permission to view it.</p>
@@ -87,10 +108,28 @@ $claim = $stmt->fetch(PDO::FETCH_ASSOC);
     <script>
         document.querySelectorAll('.confirm-button').forEach(button => {
             button.addEventListener('click', (e) => {
-            const action = button.getAttribute('data-action'); // This is either approve or reject
-            if (!confirm(`Are you sure you want to ${action} this claim?`)) {
-                e.preventDefault(); // Cancel 
-            }
+                e.preventDefault(); // Because this is done now, the return below cancels
+                const action = button.getAttribute('data-action');
+                const form = button.closest('form');
+
+                if (!confirm(`Are you sure you want to ${action} this claim?`)) {
+                    return; // Exit if user cancels
+                }
+
+                if (action === 'reject') {
+                    const managerMessage = prompt("Please provide a reason for rejection, or ask for employee elaboration (both optional):");
+                    
+                    // Only add what was typed in only if user didn't cancel the prompt
+                    if (managerMessage !== null) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'managerMessage';
+                        input.value = managerMessage;
+                        form.appendChild(input);
+                    }
+                }
+                
+                form.submit(); // Only submit text after all checks
             });
         });
     </script>
