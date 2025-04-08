@@ -86,7 +86,7 @@ if (isset($_SESSION["message"])) {
                 <option value="JPY">JPY</option>
                 <option value="AUD">AUD</option>
             </select>
-            <input type="number" step="0.01" name="amount" required>
+            <input type="number" step="0.01" name="amount" min="0.01" required>
         </div>
         <label for="description">Description:</label>
         <textarea name="description" required></textarea>
@@ -102,7 +102,7 @@ if (isset($_SESSION["message"])) {
 
         <label for="evidenceFile">Upload Evidence:</label>
         <label class="file-upload" for="image">
-            <input type="file" id="image" name="evidenceFile" accept="image/*" onchange="previewImage(event)">
+            <input type="file" id="image" name="evidenceFile" accept="image/*" onchange="previewImage(event)" required>
             Choose Image
         </label>
         <img id="imagePreview" src="" style="display:none; max-width: 300px; margin-top: 10px;">
