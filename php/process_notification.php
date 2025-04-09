@@ -1,12 +1,20 @@
 <?php
 session_start();
 require_once "models/DatabaseManager.php";
+//Import PHPMailer classes into the global namespace
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+//Load Composer's autoloader
+require '../vendor/autoload.php';
 
 // Check manager is logged in
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Manager') {
     header("Location: ../login.html");
     exit;
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && isset($_POST['email'])) { //Only go forward if POST, claimid and approve/reject is set
     $claimId = $_POST['ExpenseClaim'];
@@ -28,11 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         $subject = "Claim " . $claimId . " Rejected!";
         $contents = "Your expense claim with ID " . $claimId . " has been rejected.</p><p> Note: " . $note . "</p><p> Please contact your manager for further details.";
     } else {
-        $subject = "More Information Needed About Claim" . $claimId . ".";
+        $subject = "More Information Needed About Claim " . $claimId . ".";
         $contents = "Additional information is required for your expense claim with ID " . $claimId . ".</p><p> Note: " . $note . "</p><p> Please provide the requested details.";
     }
 
-    $email = "<!DOCTYPE html>
+    $finEmail = "<!DOCTYPE html>
     <html>
     <head>
     <style>
@@ -120,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     <body>
         <!-- Navbar -->
         <nav class='navbar'>
-            <a href='#'><img class='logo' src='../images/FDM_Group_Logo_White.png' width='200' alt='FDM Logo'></a>
+            <a href='#'><img class='logo' src='https://ibb.co/vCgxhg9d' width='200' alt='FDM Logo'></a>
         </nav>
         <br>
         <div class='container'>
@@ -142,18 +150,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     </html>";
 
     //use mail() function to send email
-    mail($email,$subject,$contents); //- working dependant on localserver settings/smtp set up
+    //mail($finEmail,$subject,$contents); //- working dependant on localserver settings/smtp set up
     //echo $email;
 
+    //use PHPmailer to create email
+    //Create a PHPMailer instance; passing `true` enables exceptions
+    $mail = new PHPMailer(true);
+
+    try {
+        //Server settings
+        $mail->isSMTP();                                            //Send using SMTP
+        $mail->Host       = 'smtp.mailersend.net';                     //Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+        $mail->Username   = 'MS_GS6vwk@test-p7kx4xw1098g9yjr.mlsender.net';                     //SMTP username
+        $mail->Password   = 'mssp.XFfv2jh.pq3enl60n57l2vwr.yhxoMZi';                               //SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
+        $mail->Port       = 2525;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+
+        //Recipients
+        $mail->setFrom('expenses@test-p7kx4xw1098g9yjr.mlsender.net', 'FDM Expenses');
+        $mail->addAddress($email, $name);     //Add a recipient
+
+        //Content
+        $mail->isHTML(true);                                  //Set email format to HTML
+        $mail->Subject = $subject;
+        $mail->Body    = $finEmail;
+
+        $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+
     // Display email content
-    echo $email;
+    echo $finEmail;
 
     // Use JavaScript to redirect after a delay
-    echo "<script>
+    /*echo "<script>
         setTimeout(function() {
             window.location.href = '../php/manager_dashboard.php';
         }, 5000); // Redirect after 5 seconds
     </script>";
+    */
 } else {
     die("Invalid request.");
 }
