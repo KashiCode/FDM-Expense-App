@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="images/favicon.ico">
-    <title>FDM Expenses - Login</title>
+    <title>FDM Expenses - Change Password</title>
     <link rel="stylesheet" href="../css/index.css">
 </head>
 <body>
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <input type="password" id="password" name="retypePassword" placeholder="Retype Password" required>
         <br>
-        <button type="submit">Login</button>
+        <button type="submit">Change Password</button>
     </form>
 </body>
 </html>

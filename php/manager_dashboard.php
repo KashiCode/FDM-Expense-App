@@ -43,6 +43,11 @@ $sql .= " ORDER BY expense_claims.status ASC";
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT spendingLimit FROM managers WHERE managerId = :managerId";
+$stmt = $conn->prepare($sql);
+$stmt->execute([':managerId' => $_SESSION['employeeId']]);
+$spendingLimit = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +104,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Claim Filter + Results -->
     <section class="weather-map">
         <h3>View All Claims</h3>
-
+        <p style="font-size:1.5rem"><strong>Spending Limit: </strong>£<?php echo $spendingLimit?></p>
         <!-- Filter Form -->
         <form method="GET">
             <label for="status">Status:</label>
@@ -145,11 +150,15 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                             <!-- Approve Form -->
-                            <form method='POST' action='../php/process_claim.php' style='display: inline;'>
-                                <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
-                                <input type='hidden' name='action' value='approve'>
-                                <button type='submit' class='confirm-button' data-action='approve'>Approve Claim</button>
-                            </form>
+                            <?php if ($spendingLimit >= $claim['amount']) {?>
+                                <form method='POST' action='../php/process_claim.php' style='display: inline;'>
+                                    <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
+                                    <input type='hidden' name='action' value='approve'>
+                                    <button type='submit' class='confirm-button' data-action='approve'>Approve Claim</button>
+                                </form>
+                            <?php } else { ?>
+                                    <button style="color:red;">Exceeds Spending Limit</button>
+                            <?php } ?>
 
                             <!-- Reject Form -->
                             <form method='POST' action='../php/process_claim.php' style='display: inline;'>
