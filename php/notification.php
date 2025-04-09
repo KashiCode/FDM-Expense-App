@@ -16,8 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
 
     $conn = DatabaseManager::getInstance()->getConnection();
 
-    echo "hello";
-    echo $action;
     // Check the claim belongs to the manager's domain
     $sql = "SELECT * FROM expense_claims 
             INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
@@ -44,14 +42,15 @@ $typeText = [
     "info" => 'More Information Needed',
 ];
 
-$selected = null; // Initialize $selected with a default value
-//set $selected to the appropriate action value in $typeText
-if (isset($action)){
-    for ($x = 1; $x <= 3; $x++) {
-        if ($options[$x] === $action){
-            $selected = $x;
+if (isset($action)) {
+    foreach ($options as $key => $value) {
+        if ($value === $action) {
+            $selected = $value;
+            break;
         }
     }
+} else {
+    $selected = $options[1]; // Default to 'approve' if no action is set
 }
 
 $message = ""
@@ -77,9 +76,8 @@ $message = ""
         <label for="type">Type:</label>
         <div class="notification-type-options">
             <select id="notification-type" name="type" required>
-                <option value="" selected disabled hidden>Choose a Reason</option>
-                <?php foreach ($options as $key) { ?>
-                    <option value="<?= $key ?>" <?= $key === $selected ? 'selected' : '' ?>><?= $typeText[$key] ?></option>
+                <?php foreach ($options as $key => $value) { ?>
+                    <option value="<?= $value ?>" <?= $value === $selected ? 'selected' : '' ?>><?= $typeText[$value] ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -89,10 +87,13 @@ $message = ""
         <select name="ExpenseClaim" required>
             <!--Info from Expense Claim-->
             <?php
-                //check if form has been submitted (came from dashboard)
-                if (!isset($action)){
+                //check if form has been submitted (came from dashboard), default option other wise
+                /*
+                if (!isset($action) || empty($action)) {
                     echo "<option value=\"\" selected disabled hidden>Choose an Expense Claim</option>";
                 }
+                echo $claimId, $action;
+                */
                 $conn = DatabaseManager::getInstance()->getConnection();
 
                 //Fetch all pending expense claim IDs
@@ -106,11 +107,10 @@ $message = ""
                     $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     foreach ($claims as $claim) {
-                        if ($claim['claimId'] === $claimId) {
-                            echo "<option id=" .$claim['employeeId']."/".$claim['firstName']."/".$claim['email']. " name='claimId' selected value=". $claim['claimId'] .">📝 Claim " . $claim['claimId'] . "</option>";
-                            echo "<option id=\"" .$claim['employeeId']."/".$claim['firstName']."/".$claim['email']. "\" name='claimId' selected value=\"". $claim['claimId'] ."\">📝 Claim " . $claim['claimId'] . "</option>";
+                        if ($claim['claimId'] == $claimId) {
+                            echo "<option id=\"" . $claim['employeeId'] . "/" . $claim['firstName'] . "/" . $claim['email'] . "\" name='claimId' selected value=\"" . $claim['claimId'] . "\">📝 Claim " . $claim['claimId'] . "</option>";
                         } else {
-                            echo "<option id=\"" .$claim['employeeId']."/".$claim['firstName']."/".$claim['email']. "\" name='claimId' value=\"". $claim['claimId'] ."\">📝 Claim " . $claim['claimId'] . "</option>";
+                            echo "<option id=\"" . $claim['employeeId'] . "/" . $claim['firstName'] . "/" . $claim['email'] . "\" name='claimId' value=\"" . $claim['claimId'] . "\">📝 Claim " . $claim['claimId'] . "</option>";
                         }
                     }
                 } else {
@@ -148,9 +148,9 @@ $message = ""
 
         <!--Text Area for note-->
         <label for="note">Note:</label>
-        <textarea name="note" required></textarea>
+        <textarea name="note"></textarea>
 
-        <button type="submit">Submit Claim</button>
+        <button type="submit">Submit Notification</button>
     </form>
 
     <p>
