@@ -24,8 +24,19 @@ class ExpenseClaim {
         $stmt->bindParam(':evidenceFile', $evidenceFile);
         // $stmt->bindParam(':receipt', $receipt);
         $stmt->bindParam(':currency', $currency);
+
+        $this->logClaim($employeeId);
         
         return $stmt->execute();
+    }
+
+    public function logClaim($employeeId) {
+        $username = $_SESSION['username'];
+        $role = $_SESSION['role'];
+        $sql = "INSERT INTO sys_log (employeeId, username, role, event, eventTime) VALUES (:employeeId, (SELECT username FROM employees WHERE employeeId = :employeeId), :role, :event, NOW())";
+        $event = $username . " Created A New Claim";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':employeeId' => $employeeId, ':event' => $event, ':role' => $role]);
     }
 }
 ?>

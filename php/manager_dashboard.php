@@ -51,7 +51,6 @@ $spendingLimit = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
-	@@ -16,80 +45,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FDM Expense App</title>
     <link rel="stylesheet" href="../css/style.css">
