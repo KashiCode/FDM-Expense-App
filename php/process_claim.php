@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     $action = $_POST['action']; // 'approve' or 'reject'
     $managerId = $_SESSION['employeeId'];
     $managerMessage = $_POST['managerMessage'] ?? null; //If its not set, then set to null
+    $username = $_SESSION['username'];
 
     $conn = DatabaseManager::getInstance()->getConnection();
 
@@ -39,9 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     $updateStmt->bindParam(':managerMessage', $managerMessage);
     $updateStmt->execute();
 
-    $sql = "UPDATE managers SET spendingLimit = spendingLimit - (SELECT amount FROM expense_claims WHERE claimId = :claimId LIMIT 1) WHERE managerId = :managerId";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':managerId' => $managerId, ':claimId' => $claimId]);
+    if ($action == 'approve') {
+        // If approved, update the spending limit of the manager
+        $sql = "UPDATE managers SET spendingLimit = spendingLimit - (SELECT amount FROM expense_claims WHERE claimId = :claimId LIMIT 1) WHERE managerId = :managerId";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':managerId' => $managerId, ':claimId' => $claimId]);
+
+        $sql = "INSERT INTO sys_log (employeeId, username, role, event, eventTime) VALUES (:managerId, (SELECT username FROM employees WHERE employeeId = :managerId), 'Manager', :event, NOW())";
+        $event = $username . " Accepted Claim " . $claimId;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':managerId' => $managerId, ':event' => $event]);
+    } else {
+        // If rejected, log the event
+        $sql = "INSERT INTO sys_log (employeeId, username, role, event, eventTime) VALUES (:managerId, (SELECT username FROM employees WHERE employeeId = :managerId), 'Manager', :event, NOW())";
+        $event = $username . " Rejected Claim " . $claimId;
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':managerId' => $managerId, ':event' => $event]);
+    }
 
     // Redirect back to dashboard
     header("Location: ../php/manager_dashboard.php");

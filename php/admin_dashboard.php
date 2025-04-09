@@ -139,16 +139,56 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
         <?php endif; ?>
     </section>
 
-    <!-- System Logs Placeholder -->
     <section class="weather-map">
         <h3>System Logs</h3>
         <div class="tabs">
-            <button>Search User</button>
-            <button>Sort Oldest</button>
-            <button>Sort Newest</button>
+            <form method="GET" action="admin_dashboard.php" style="display: inline;">
+                <input type="hidden" name="search" value="<?= htmlspecialchars($searchTerm) ?>">
+                <input type="hidden" name="role" value="<?= htmlspecialchars($roleFilter) ?>">
+                <button type="submit" name="sort" value="oldest">Sort Oldest</button>
+                <button type="submit" name="sort" value="newest">Sort Newest</button>
+            </form>
         </div>
         <br>
-        <div class="map-placeholder">[System Log table placeholder]</div>
+        <div class="scrollable-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>Action</th>
+                        <th>Username</th>
+                        <th>Employee ID</th>
+                        <th>Role</th>
+                        <th>Event Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sortOrder = isset($_GET['sort']) && $_GET['sort'] === 'oldest' ? 'ASC' : 'DESC';
+                    $logSql = "SELECT * FROM sys_log ORDER BY eventTime $sortOrder";
+                    $logStmt = $conn->prepare($logSql);
+                    $logStmt->execute();
+                    $logs = $logStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    if (count($logs) === 0): ?>
+                        <tr>
+                            <td colspan="5">No logs found.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($logs as $log): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($log['logId']) ?></td>
+                                <td><?= htmlspecialchars($log['event']) ?></td>
+                                <td><?= htmlspecialchars($log['username']) ?></td>
+                                <td><?= htmlspecialchars($log['employeeId']) ?></td>
+                                <td><?= htmlspecialchars($log['role']) ?></td>
+                                <td><?= htmlspecialchars($log['eventTime']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </section>
 </div>
 </body>

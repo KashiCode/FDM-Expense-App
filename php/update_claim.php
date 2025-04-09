@@ -55,6 +55,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    $username = $_SESSION['username'];
+    $role = $_SESSION['role'];
+    $sql = "INSERT INTO sys_log (employeeId, username, role, event, eventTime) VALUES (:employeeId, (SELECT username FROM employees WHERE employeeId = :employeeId), :role, :event, NOW())";
+    $event = $username . " Updated Claim " . $claimId;
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':employeeId' => $employeeId, ':event' => $event, ':role' => $role]);
+
     // Update claim in the database
     $sql = "UPDATE expense_claims SET amount = ?, description = ?, category = ?, currency = ?, evidenceFile = ? WHERE claimId = ? AND employeeId = ?";
     $stmt = $conn->prepare($sql);

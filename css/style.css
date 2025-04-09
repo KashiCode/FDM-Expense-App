@@ -133,6 +133,48 @@ button:hover {
   justify-content: center;
 }
 
+.scrollable-table {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 12px;
+  }
+  /* Custom Scrollbar Styles */
+  .scrollable-table::-webkit-scrollbar {
+    width: 8px;
+    margin-left: 8px;
+  }
+
+  .scrollable-table::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 4px;
+  }
+
+  .scrollable-table::-webkit-scrollbar-thumb:hover {
+    background-color: white;
+  }
+
+  .scrollable-table::-webkit-scrollbar-track {
+    background-color: #1D2837;
+    border-radius: 4px;
+  }
+
+  .scrollable-table table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12;
+  }
+  .scrollable-table th, .scrollable-table td {
+  border-radius: 12px;
+  padding: 8px;
+  text-align: left;
+  }
+  .scrollable-table th {
+  background-color: #2C3C54;
+  position: sticky;
+  top: 0;
+  }
+  
 .report {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.15);
