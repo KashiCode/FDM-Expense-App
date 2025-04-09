@@ -133,9 +133,7 @@ $message = ""
                 var s = document.getElementsByName('ExpenseClaim')[0];
                 s.addEventListener('change', function () {
                     var selectedOption = s.options[s.selectedIndex];
-                    console.log(selectedOption.id);
                     const textArray = selectedOption.id.split("/");
-                    console.log(textArray);
                     document.getElementById("employeeIdText").innerHTML = textArray[0] || "undefined";
                     document.getElementById("name").value = textArray[1] || "undefined";
                     document.getElementById("employeeNameText").innerHTML = textArray[1] || "undefined";
