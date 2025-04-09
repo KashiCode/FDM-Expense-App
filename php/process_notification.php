@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     //echo $email;
 
     // Display email content
-    //echo $email;
+    echo $email;
 
     // Use JavaScript to redirect after a delay
     echo "<script>
@@ -154,8 +154,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
             window.location.href = '../php/manager_dashboard.php';
         }, 5000); // Redirect after 5 seconds
     </script>";
-    //redirect back to manager dashboard - uncomment or will be stuck on page.
-    //header("Location: ../php/manager_dashboard.php");
 } else {
     die("Invalid request.");
 }
