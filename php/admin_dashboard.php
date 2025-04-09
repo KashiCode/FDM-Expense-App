@@ -127,6 +127,13 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
                         <input type="hidden" name="employeeId" value="<?= $user['employeeId'] ?>">
                         <button type="submit">Change Password</button>
                     </form>
+                    <?php if ($user['role'] === 'Manager'): ?>
+                        <!-- View Reports Button -->
+                        <form method="GET" action="update_limit.php" style="display:inline;">
+                            <input type="hidden" name="employeeId" value="<?= $user['employeeId'] ?>">
+                            <button type="submit">Update Spending Limit</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>

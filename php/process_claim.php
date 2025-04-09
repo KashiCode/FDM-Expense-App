@@ -39,6 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     $updateStmt->bindParam(':managerMessage', $managerMessage);
     $updateStmt->execute();
 
+    $sql = "UPDATE managers SET spendingLimit = spendingLimit - (SELECT amount FROM expense_claims WHERE claimId = :claimId LIMIT 1) WHERE managerId = :managerId";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':managerId' => $managerId, ':claimId' => $claimId]);
+
     // Redirect back to dashboard
     header("Location: ../php/manager_dashboard.php");
     exit;
