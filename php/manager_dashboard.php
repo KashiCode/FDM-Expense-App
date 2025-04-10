@@ -173,6 +173,14 @@ $spendingLimit = $stmt->fetchColumn();
                                 <button type='submit' class='confirm-button' data-action='reject'>Reject Claim</button>
                             </form>
 
+                            <!-- Request More Information Form -->
+                            <form method='POST' action='../php/notification.php' style='display: inline;'>
+                                <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
+                                <input type='hidden' name='action' value='info'>
+                                <input type='hidden' name='redir' value='../php/manager_dashboard.php'>
+                                <button type='submit' class='confirm-button' data-action='info'>Request More Information</button>
+                            </form>
+
                             <button onclick="window.location.href='view_claim.php?id=<?php echo $claim['claimId']; ?>'">View Claim</button>
                         <?php } else if ($claim['status'] == 'Rejected') { ?>
                             <div class='badges'>

@@ -158,6 +158,13 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </section>
 </div>
 
+<!--add hidden form for email notif-->
+<form name='notification' method='POST' action='../php/notification.php' enctype='multipart/form-data'>
+<input type='hidden' name='action' value=''>
+<input type='hidden' name='claimId' value=''>
+<input type='hidden' name='redir' value='../php/finance_dashboard.php'>
+</form>
+
 <script>
 function markAsReimbursed(claimId, amount) {
   fetch('../php/finance_actions.php', {
@@ -168,21 +175,34 @@ function markAsReimbursed(claimId, amount) {
   .then(res => res.json())
   .then(data => {
     alert(data.message);
-    location.reload();
+    document.notification.action.value = 'reimburse';
+    document.notification.claimId.value = claimId;
+    document.notification.submit();
+    ;
   });
 }
 
 function approveClaim(claimId) {
   if (confirm("Approve claim #" + claimId + "?")) {
     fetch('../php/approve_claim.php?id=' + claimId)
-      .then(() => location.reload());
+      .then(() => {
+        document.notification.action.value = 'accept';
+        document.notification.claimId.value = claimId;
+        document.notification.submit();
+      });
+      /*location.reload());*/
   }
 }
 
 function rejectClaim(claimId) {
   if (confirm("Reject claim #" + claimId + "?")) {
     fetch('../php/reject_claim.php?id=' + claimId)
-      .then(() => location.reload());
+      .then(() => {
+        document.notification.action.value = 'reject';
+        document.notification.claimId.value = claimId;
+        document.notification.submit();
+      });
+      /*location.reload());*/
   }
 }
 </script>

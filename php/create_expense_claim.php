@@ -36,11 +36,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Create the expense claim
     $claim = new ExpenseClaim();
     if ($claim->createClaim($employeeId, $amount, $description, $category, $evidenceFile, "", $currency)) {
-        header("Location: employee_dashboard.php"); // Redirect to homepage
+        $conn = DatabaseManager::getInstance()->getConnection();
+        $sql = "SELECT ec.*, CONCAT(e.firstName, ' ', e.lastName) AS employee_name, CONCAT(m.firstName, ' ', m.lastName) AS manager_name, m.email AS manager_email FROM expense_claims ec JOIN employees e ON ec.employeeId = e.employeeId JOIN employees m ON e.manager = m.employeeId WHERE ec.employeeId = :employeeId ORDER BY ec.date DESC LIMIT 1;";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([':employeeId' => $employeeId]);
+        $newClaim = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo "<form name='notification' method='POST' action='../php/process_notification.php' enctype='multipart/form-data'>";
+        echo "<input type='hidden' name='type' value='newExpense'>";
+        echo "<input type='hidden' name='ExpenseClaim' value='" . $newClaim['claimId'] . "'>";
+        echo "<input type='hidden' name='email' value='" . $newClaim['manager_email'] . "'>";
+        echo "<input type='hidden' name='name' value='" . $newClaim['manager_name'] . "'>";
+        echo "<input type='hidden' name='Sname' value='" . $newClaim['employee_name'] . "'>";
+        echo "<input type='hidden' name='note' value=''>";
+        echo "<input type='hidden' name='redir' value='./employee_dashboard.php'>";
+        echo "</form>";
+        echo "<script type='text/javascript'>document.notification.submit();</script>";
+        // header("Location: employee_dashboard.php"); // Redirect to homepage
         exit();
     } else {
         $message = "Error submitting claim.";
     }
+
 }
 
 // Show message after redirection
