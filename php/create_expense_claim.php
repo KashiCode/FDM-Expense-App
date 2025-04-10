@@ -72,10 +72,6 @@ if (isset($_SESSION["message"])) {
 <body>
     <h1>Create Expense Claim</h1>
 
-    <?php if ($message): ?>
-        <p id="signUpMessage"><?php echo $message; ?></p>
-    <?php endif; ?>
-
     <form method="post" action="" enctype="multipart/form-data">
         <label for="amount">Amount:</label>
         <div class="currecy-amount">
