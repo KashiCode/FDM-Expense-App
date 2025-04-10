@@ -64,5 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <button type="submit">Create Manager</button>
     </form>
+
+    <p>
+    </p>
+    <div class="home-button">
+        <a href="admin_dashboard.php">Homepage</a>
+    </div>
 </body>
 </html>
