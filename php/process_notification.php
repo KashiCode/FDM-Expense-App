@@ -9,8 +9,6 @@ use PHPMailer\PHPMailer\Exception;
 //Load Composer's autoloader
 require '../vendor/autoload.php';
 
-Print_r($_POST);
-
 // Check manager is logged in
 if (!isset($_SESSION['employeeId'])) {
     header("Location: ../login.html");
@@ -122,20 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     }
     // Display email content
     echo $finEmail;
-
-    // Use JavaScript to redirect after a delay
     
-    if (!empty($redir)) {
-        echo "<script>
-            setTimeout(function() {
-                window.location.href = '" . htmlspecialchars($redir, ENT_QUOTES, 'UTF-8') . "';
-            }, 5000); // Redirect after 5 seconds
-        </script>";
-    } else {
-        echo "Redirection URL is missing.";
-    }
-    
-    //header("Location: ".$redir);
+    header("Location: ".$redir);
 } else {
     die("Invalid request.");
 }
