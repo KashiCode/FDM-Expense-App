@@ -28,6 +28,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     if ($stmt->rowCount() == 0) {
         die("Claim out of your domain!");
     }
+    // Fetch the first and last name of the manager
+    $sql = "SELECT firstName, lastName FROM employees WHERE employeeId = :managerId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':managerId', $managerId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        $manager = $stmt->fetch(PDO::FETCH_ASSOC);
+        $managerFirstName = $manager['firstName'];
+        $managerLastName = $manager['lastName'];
+    } else {
+        die("Manager not found!");
+    }
 }
 
 $options = [
@@ -87,13 +100,6 @@ $message = ""
         <select name="ExpenseClaim" required>
             <!--Info from Expense Claim-->
             <?php
-                //check if form has been submitted (came from dashboard), default option other wise
-                /*
-                if (!isset($action) || empty($action)) {
-                    echo "<option value=\"\" selected disabled hidden>Choose an Expense Claim</option>";
-                }
-                echo $claimId, $action;
-                */
                 $conn = DatabaseManager::getInstance()->getConnection();
 
                 //Fetch all pending expense claim IDs
@@ -149,6 +155,8 @@ $message = ""
         <!--Text Area for note-->
         <label for="note">Note:</label>
         <textarea name="note"></textarea>
+        <input type='hidden' name='redir' value='./manager_dashboard.php'>;
+        <input type='hidden' name='Sname' value='<?= $managerFirstName ?> <?= $managerLastName ?>'>
 
         <button type="submit">Submit Notification</button>
     </form>
@@ -156,7 +164,7 @@ $message = ""
     <p>
     </p>
     <div class="home-button">
-        <a href="employee_dashboard.php">Homepage</a>
+        <a href="manager_dashboard.php">Homepage</a>
     </div>
 
 </body>

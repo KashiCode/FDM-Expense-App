@@ -26,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     $note = $_POST['note']; // email content
     $subject = "";
     $contents = "";
+    $redir = $_POST['redir']; // redirect page
     $managerId = $_SESSION['employeeId'];
     
     // construct subject line and contents based on notification options
@@ -71,6 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
                             <h1 style='color:#ffffff; margin-top:0;'>$subject</h1>
                             <h3 style='color:#ffffff;'>Dear $name,</h3>
                             <p style='color:#ffffff; line-height:1.6;'>$contents</p>
+                            <br>
+                            <p style='color:#ffffff; line-height:1.6;'>Best Regards,</p>
+                            <p style='color:#ffffff; line-height:1.6;'>$Sname</p>
                         </div>
                     </td>
                     </tr>
@@ -87,10 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         </body>
         </html>";
 
-    //use mail() function to send email
-    //mail($finEmail,$subject,$contents); //- working dependant on localserver settings/smtp set up
-    //echo $email;
-
     //use PHPmailer to create email
     //Create a PHPMailer instance; passing `true` enables exceptions
     $mail = new PHPMailer(true);
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         $mail->Username   = 'MS_GS6vwk@test-p7kx4xw1098g9yjr.mlsender.net';                     //SMTP username
         $mail->Password   = 'mssp.XFfv2jh.pq3enl60n57l2vwr.yhxoMZi';                               //SMTP password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
-        $mail->Port       = 2525;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+        $mail->Port       = 2525;                                    //TCP port to connect to;
 
         //Recipients
         $mail->setFrom('expenses@test-p7kx4xw1098g9yjr.mlsender.net', 'FDM Expenses');
@@ -114,22 +114,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         $mail->Subject = $subject;
         $mail->Body    = $finEmail;
 
-        $mail->send();
+        //$mail->send();
         echo 'Message has been sent';
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
-
     // Display email content
     echo $finEmail;
 
     // Use JavaScript to redirect after a delay
     /*
-    echo "<script>
-        setTimeout(function() {
-            window.location.href = '../php/manager_dashboard.php';
-        }, 5000); // Redirect after 5 seconds
-    </script>";
+    if (!empty($redir)) {
+        echo "<script>
+            setTimeout(function() {
+                window.location.href = '" . htmlspecialchars($redir, ENT_QUOTES, 'UTF-8') . "';
+            }, 5000); // Redirect after 5 seconds
+        </script>";
+    } else {
+        echo "Redirection URL is missing.";
+    }
     */
 } else {
     die("Invalid request.");
