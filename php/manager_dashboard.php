@@ -162,6 +162,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <form method='POST' action='../php/notification.php' style='display: inline;'>
                                 <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
                                 <input type='hidden' name='action' value='info'>
+                                <input type='hidden' name='redir' value='../php/manager_dashboard.php'>
                                 <button type='submit' class='confirm-button' data-action='info'>Request More Information</button>
                             </form>
 

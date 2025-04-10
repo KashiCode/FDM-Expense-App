@@ -36,8 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     $updateStmt->bindParam(':claimId', $claimId); //Binded for security
     $updateStmt->execute();
 
+    // Redirect to notification page
+    echo "<form name='notification' method='POST' action='../php/notification.php' enctype='multipart/form-data'>";
+    echo "<input type='hidden' name='action' value='".$action."'>";
+    echo "<input type='hidden' name='claimId' value='" .$claimId. "'>";
+    echo "<input type='hidden' name='redir' value='../php/manager_dashboard.php'>";
+    echo "</form>";
+    echo "<script type='text/javascript'>document.notification.submit();</script>";
+
     // Redirect back to dashboard
-    header("Location: ../php/manager_dashboard.php");
+    //header("Location: ../php/manager_dashboard.php");
     exit;
 } else {
     die("Invalid request.");

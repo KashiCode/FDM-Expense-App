@@ -15,8 +15,6 @@ if (!isset($_SESSION['employeeId'])) {
     exit;
 }
 
-print_r($_POST);
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && isset($_POST['email'])) { //Only go forward if POST, claimid and approve/reject is set
     $claimId = $_POST['ExpenseClaim'];
     $email = $_POST['email']; // employee email
@@ -26,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     $note = $_POST['note']; // email content
     $subject = "";
     $contents = "";
+    $end = "<p style='color:#ffffff; line-height:1.6;'>Best Regards,</p><p style='color:#ffffff; line-height:1.6;'>$Sname</p>";
     $redir = $_POST['redir']; // redirect page
     $managerId = $_SESSION['employeeId'];
     
@@ -37,12 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         $subject = "Claim " . $claimId . " Rejected!";
         $contents = "Your expense claim with ID " . $claimId . " has been rejected.</p><p style='color:#ffffff; line-height:1.6;'> Note: " . $note . "</p><p style='color:#ffffff; line-height:1.6;'> Please contact your manager for further details.";
     } elseif ($type === "info") {
-        $subject = "More Information Needed About Claim " . $claimId . ".";
+        $subject = "More Information Needed About Expense Claim " . $claimId . ".";
         $contents = "Additional information is required for your expense claim with ID " . $claimId . ".</p><p style='color:#ffffff; line-height:1.6;'> Note: " . $note . "</p><p style='color:#ffffff; line-height:1.6;'> Please provide the requested details.";
-    } else {
+    } elseif ($type === "newExpense") {
         $subject = "New Claim " . $claimId . " from ".$Sname. ".";
         $contents =  $Sname . " has created a new expense claim: Claim " . $claimId . ".</p><p style='color:#ffffff; line-height:1.6;'>";
-    } 
+        $end = '';
+    } else {
+        $subject = "Your Expense Claim " . $claimId . " has been reimbursed!";
+        $contents =  " The full amount of your Expense Claim with ID: " . $claimId . " has been deposited into your registered account.</p><p style='color:#ffffff; line-height:1.6;'>If any issues occur, please feel free to contact the Finance Team.";
+    }
 
     $finEmail = "
         <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
@@ -73,8 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
                             <h3 style='color:#ffffff;'>Dear $name,</h3>
                             <p style='color:#ffffff; line-height:1.6;'>$contents</p>
                             <br>
-                            <p style='color:#ffffff; line-height:1.6;'>Best Regards,</p>
-                            <p style='color:#ffffff; line-height:1.6;'>$Sname</p>
+                            
                         </div>
                     </td>
                     </tr>
@@ -114,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         $mail->Subject = $subject;
         $mail->Body    = $finEmail;
 
-        //$mail->send();
+        $mail->send();
         echo 'Message has been sent';
     } catch (Exception $e) {
         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
@@ -134,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         echo "Redirection URL is missing.";
     }
     */
+    header("Location: ".$redir);
 } else {
     die("Invalid request.");
 }

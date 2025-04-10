@@ -9,25 +9,30 @@ if (!isset($_SESSION["employeeId"])) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_POST['action'])) { //Only go forward if POST, claimid and approve/reject is set
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_POST['action'])) { //Only go forward if POST, claimid and type is set
     $claimId = $_POST['claimId'];
-    $action = $_POST['action']; // 'approve' or 'reject'
+    $action = $_POST['action']; // type of notification
+    $redir = $_POST['redir'];
+    $selected = '';
     $managerId = $_SESSION['employeeId'];
 
     $conn = DatabaseManager::getInstance()->getConnection();
 
-    // Check the claim belongs to the manager's domain
-    $sql = "SELECT * FROM expense_claims 
-            INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
-            WHERE claimId = :claimId AND employees.manager = :managerId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':claimId', $claimId, PDO::PARAM_INT);
-    $stmt->bindParam(':managerId', $managerId, PDO::PARAM_INT);
-    $stmt->execute();
+    if ($_SESSION['role'] !== 'Finance' ) {
+        // Check the claim belongs to the manager's domain
+        $sql = "SELECT * FROM expense_claims 
+                INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
+                WHERE claimId = :claimId AND employees.manager = :managerId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':claimId', $claimId, PDO::PARAM_INT);
+        $stmt->bindParam(':managerId', $managerId, PDO::PARAM_INT);
+        $stmt->execute();
 
-    if ($stmt->rowCount() == 0) {
-        die("Claim out of your domain!");
+        if ($stmt->rowCount() == 0) {
+            die("Claim out of your domain!");
+        }
     }
+
     // Fetch the first and last name of the manager
     $sql = "SELECT firstName, lastName FROM employees WHERE employeeId = :managerId";
     $stmt = $conn->prepare($sql);
@@ -47,24 +52,15 @@ $options = [
     1 => 'approve',
     2 => 'reject',
     3 => 'info',
+    4 => 'reimburse'
 ];
 
 $typeText = [
     "approve" => 'Claim Approved',
     "reject" => 'Claim Rejected',
     "info" => 'More Information Needed',
+    "reimburse" => 'Reimbursement'
 ];
-
-if (isset($action)) {
-    foreach ($options as $key => $value) {
-        if ($value === $action) {
-            $selected = $value;
-            break;
-        }
-    }
-} else {
-    $selected = $options[1]; // Default to 'approve' if no action is set
-}
 
 $message = ""
 ?>
@@ -90,7 +86,7 @@ $message = ""
         <div class="notification-type-options">
             <select id="notification-type" name="type" required>
                 <?php foreach ($options as $key => $value) { ?>
-                    <option value="<?= $value ?>" <?= $value === $selected ? 'selected' : '' ?>><?= $typeText[$value] ?></option>
+                    <option value="<?= $value ?>" <?= $value === $action ? 'selected' : '' ?>><?= $typeText[$value] ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -101,11 +97,21 @@ $message = ""
             <!--Info from Expense Claim-->
             <?php
                 $conn = DatabaseManager::getInstance()->getConnection();
-
-                //Fetch all pending expense claim IDs
-                $sql = "SELECT * FROM `expense_claims`
+                
+                if ($action === 'info') {
+                    //Fetch all pending expense claim IDs
+                    $sql = "SELECT * FROM `expense_claims`
                         INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
                         WHERE STATUS = 'Pending';";
+                } else if ($action === 'accept' || $action === 'reject'|| $action === 'reimburse') {
+                    //Fetch specific expense claim being accepted, rejected or reimbursed
+                    $sql = "SELECT * FROM `expense_claims` INNER JOIN employees ON expense_claims.employeeId = employees.employeeId WHERE expense_claims.claimId = ".$claimId.";";
+                } else {
+                    //Fetch all expense claims in case of error
+                    $sql = "SELECT * FROM `expense_claims`
+                        INNER JOIN employees ON expense_claims.employeeId = employees.employeeId;";
+                }
+                
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
 
@@ -155,7 +161,7 @@ $message = ""
         <!--Text Area for note-->
         <label for="note">Note:</label>
         <textarea name="note"></textarea>
-        <input type='hidden' name='redir' value='./manager_dashboard.php'>;
+        <input type='hidden' name='redir' value='<?= $redir ?>'>
         <input type='hidden' name='Sname' value='<?= $managerFirstName ?> <?= $managerLastName ?>'>
 
         <button type="submit">Submit Notification</button>
