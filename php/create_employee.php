@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $employee = new Employee();
     if ($employee->createEmployee($firstName, $lastName, $email, $role, $username, $password, $manager)) {
         $message = "Employee created successfully!";
-        header("Location: create_employee.php");
+        header("Location: admin_dashboard.php");
         exit();
     } else {
         $message = "Error creating employee.";
@@ -87,5 +87,10 @@ $stmt->execute();
 
         <button type="submit">Create Employee</button>
     </form>
+
+    <p></p>
+    <div class="home-button">
+        <a href="admin_dashboard.php">Homepage</a>
+    </div>
 </body>
 </html>
