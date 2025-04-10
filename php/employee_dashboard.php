@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] !== 'Employee') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 
@@ -11,7 +11,7 @@ $employeeId = $_SESSION['employeeId'];
 $conn = DatabaseManager::getInstance()->getConnection();
 
 // Fetch the most recent approved or rejected claim
-$sql = "SELECT * FROM expense_claims WHERE employeeId = :employeeId AND status IN ('Approved', 'Rejected') ORDER BY date DESC LIMIT 1";
+$sql = "SELECT * FROM expense_claims WHERE employeeId = :employeeId AND status IN ('Approved', 'Rejected','Reimbursed') ORDER BY date DESC LIMIT 1";
 $stmt = $conn->prepare($sql);
 $stmt->execute([':employeeId' => $employeeId]);
 $recentClaim = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -32,9 +32,14 @@ if (!empty($_GET['amount'])) {
     $sql .= " AND amount = :amount";
     $params[':amount'] = $_GET['amount'];
 }
+
 $status = $_GET['status'] ?? 'Pending';
-$sql .= " AND status = :status ORDER BY date DESC";
-$params[':status'] = $status;
+if ($status !== 'All') {
+    $sql .= " AND status = :status";
+    $params[':status'] = $status;
+}
+$sql .= " ORDER BY date DESC";
+
 
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
@@ -54,9 +59,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Navbar -->
         <nav class="navbar">
             <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
-            <div class="tabs">
-                <button onclick="window.location.href='create_expense_claim.php';">Create Claim</button>
-            </div>
+            <h1 style="margin-left:2rem">Employee Portal</h1>
+
             <div class="nav-links">
                 <form method="POST" action="../php/logout.php">
                     <button class="Btn" type="submit">
@@ -70,13 +74,25 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </nav>
         <br>
 
+        <section class="weather-map">
+        <div class="tabs">
+                <a href="create_expense_claim.php" class="create-claim-btn">Create New Claim</a>
+            </div>
+        </section>
+
         <!-- Alerts -->
         <section class="active-alerts">
-            <h3>⚠️ Account Alert ⚠️</h3>
+            <h3>Latest Claim Alert</h3>
+            <hr class="styled-hr">
+
+
             <?php if ($recentClaim): ?>
                 <div class="report">
-                    <h4>Most Recent Claim Update</h4>
                     <p><strong>Claim Status:</strong> <?= $recentClaim['status'] ?></p>
+                    <?php if (!empty($recentClaim['managerMessage'])): ?>
+                            <p><strong>Manager's response:</strong>
+                            <?= htmlspecialchars($recentClaim['managerMessage']) ?></p>
+                    <?php endif; ?>
                     <p><strong>Amount:</strong> <?= $recentClaim['currency'] ?> <?= number_format($recentClaim['amount'], 2) ?></p>
                     <p><strong>Date Submitted:</strong> <?= date("d/m/Y H:i", strtotime($recentClaim['date'])) ?></p>
                     <p><strong>Category:</strong> <?= $recentClaim['category'] ?></p>
@@ -95,8 +111,11 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- Claims Viewing Section -->
         <section class="weather-map">
+
             <h3>View Claims</h3>
-            <form method="GET" action="">
+            <hr class="styled-hr">
+
+            <form method="GET" action="" style="display: flex; flex-wrap: wrap; gap: 20px;">
                 <input id="filter-date" type="date" name="date" value="<?= $_GET['date'] ?? '' ?>">
                 <select id="filter-select" name="category">
                     <option value="">All Categories</option>
@@ -108,9 +127,11 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </select>
                 <input id="filter-text" type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>" placeholder="Enter Amount">
                 <select id="filter-select" name="status">
+                    <option value="All" <?= ($status === 'All') ? 'selected' : '' ?>>All</option>
                     <option value="Pending" <?= ($status === 'Pending') ? 'selected' : '' ?>>Pending</option>
                     <option value="Approved" <?= ($status === 'Approved') ? 'selected' : '' ?>>Approved</option>
                     <option value="Rejected" <?= ($status === 'Rejected') ? 'selected' : '' ?>>Rejected</option>
+                    <option value="Reimbursed" <?= ($status === 'Reimbursed') ? 'selected' : '' ?>>Reimbursed</option>
                 </select>
                 <button type="submit">Filter</button>
             </form>
@@ -121,11 +142,14 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php else: ?>
                 <?php foreach ($claims as $index => $claim): ?>
                     <div class="report">
-                        <h4>Claim #<?= $index + 1 ?></h4>
+                        <h4>Claim <?= $index + 1 ?></h4>
+                        <hr class="styled-hr">
+
                         <p><strong>Amount:</strong> <?= $claim['currency'] ?> <?= number_format($claim['amount'], 2) ?></p>
                         <p><strong>Date Submitted:</strong> <?= date("d/m/Y H:i", strtotime($claim['date'])) ?></p>
                         <p><strong>Category:</strong> <?= $claim['category'] ?></p>
                         <p><strong>Description:</strong> <?= htmlspecialchars($claim['description']) ?></p>
+                        
                         <?php if (!empty($claim['evidenceFile']) && file_exists($claim['evidenceFile'])): ?>
                             <p><strong>Evidence:</strong></p>
                             <a href="<?= $claim['evidenceFile'] ?>" target="_blank">
@@ -143,7 +167,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <button type="submit">Delete Claim</button>
                             </form>
                         <?php elseif ($claim['status'] === 'Rejected'): ?>
-                            <button>View Response</button>
+                            <?php if (!empty($recentClaim['managerMessage'])): ?>
+                            <p><strong>Manager's response:</strong>
+                            <?= htmlspecialchars($recentClaim['managerMessage']) ?></p>
+                    <?php endif; ?>
                         <?php endif; ?>
                         <div class="badges">
                             <button class="<?= strtolower($claim['status']); ?>"><?= $claim['status'] ?></button>

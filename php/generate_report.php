@@ -1,14 +1,33 @@
 <?php
+session_start();
+if (!isset($_SESSION['employeeId']) || $_SESSION['role'] !== 'Finance') {
+    header("Location: ../loginPage.php");
+    exit();
+}
 require_once "tcpdf/tcpdf.php";
 require_once "models/DatabaseManager.php";
 
 $conn = DatabaseManager::getInstance()->getConnection();
 
-$sql = "SELECT ec.*, e.firstName, e.lastName FROM expense_claims ec JOIN employees e ON ec.employeeID = e.employeeID WHERE ec.status = 'Reimbursed' ORDER BY ec.date DESC";
+$currentEmployeeId = $_SESSION['employeeId'];
 
-$statement = $conn->prepare($sql);
-$statement->execute();
-$claims = $statement->fetchAll(PDO::FETCH_ASSOC);
+$sql = "SELECT ec.*, e.firstName, e.lastName 
+        FROM expense_claims ec
+        INNER JOIN employees e ON ec.employeeId = e.employeeId
+        WHERE ec.status IN ('Reimbursed')
+          AND e.manager = (
+              SELECT manager
+              FROM employees
+              WHERE employeeId = :currentEmployeeId
+          )";
+
+$params = [':currentEmployeeId' => $currentEmployeeId];
+
+
+$sql .= " ORDER BY date DESC";
+$stmt = $conn->prepare($sql);
+$stmt->execute($params);
+$claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 // pdf creation

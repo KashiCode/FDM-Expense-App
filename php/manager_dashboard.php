@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Manager') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 require_once "models/DatabaseManager.php";
@@ -43,10 +43,14 @@ $sql .= " ORDER BY expense_claims.status ASC";
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT spendingLimit FROM managers WHERE managerId = :managerId";
+$stmt = $conn->prepare($sql);
+$stmt->execute([':managerId' => $_SESSION['employeeId']]);
+$spendingLimit = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
-	@@ -16,80 +45,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FDM Expense App</title>
     <link rel="stylesheet" href="../css/style.css">
@@ -56,11 +60,13 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Navbar -->
     <nav class="navbar">
         <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+        <h1 style="margin-left:2rem">Manager Portal</h1>
+
         <div class="nav-links">
             <form method="POST" action="../php/logout.php" style="display: inline;">
                 <button class="Btn" type="submit">
                     <div class="sign">
-                        <svg viewBox="0 0 512 512"><path d="..."></path></svg>
+                    <svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg>
                     </div>
                     <div class="text">Logout</div>
                 </button>
@@ -83,7 +89,9 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $alertclaims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!empty($alertclaims)) {
         echo '<section class="active-alerts">
-                <h3>⚠️ Account Alert ⚠️</h3>';
+                <h3>Account Alert</h3>
+                <hr class="styled-hr">';
+                
         foreach ($alertclaims as $alert) {
             echo '<div class="report">
                     <h4>New Claim Added</h4>
@@ -99,9 +107,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Claim Filter + Results -->
     <section class="weather-map">
         <h3>View All Claims</h3>
-
+        <hr class="styled-hr">
+        <p style="font-size:1.5rem"><strong>Spending Limit: </strong>£<?php echo $spendingLimit?></p>
         <!-- Filter Form -->
-        <form method="GET">
+        <form method="GET" style="display: flex; flex-wrap: wrap; gap: 1rem;">
             <label for="status">Status:</label>
             <select id="filter-select" name="status" id="status">
                 <option value="">All</option>
@@ -134,7 +143,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php if ($claims): ?>
             <?php foreach ($claims as $claim): ?>
                 <div class="report">
-                    <h4>📝 Claim <?= $claim['claimId'] ?></h4>
+                    <h4>Claim <?= $claim['claimId'] ?></h4>
+                    <hr class="styled-hr">
                     <h5>Employee: <?= $claim['firstName'] . ' ' . $claim['lastName'] ?></h5>
                     <h4>Amount: <?= $claim['currency'] . ' ' . $claim['amount'] ?></h4>
                     <p><?= $claim['description'] ?></p>
@@ -145,16 +155,21 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                             <!-- Approve Form -->
-                            <form method='POST' action='../php/process_claim.php' style='display: inline;'>
-                                <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
-                                <input type='hidden' name='action' value='approve'>
-                                <button type='submit' class='confirm-button' data-action='approve'>Approve Claim</button>
-                            </form>
+                            <?php if ($spendingLimit >= $claim['amount']) {?>
+                                <form method='POST' action='../php/process_claim.php' style='display: inline;'>
+                                    <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
+                                    <input type='hidden' name='action' value='approve'>
+                                    <button type='submit' class='confirm-button' data-action='approve'>Approve Claim</button>
+                                </form>
+                            <?php } else { ?>
+                                    <button style="color:red;">Exceeds Spending Limit</button>
+                            <?php } ?>
 
                             <!-- Reject Form -->
                             <form method='POST' action='../php/process_claim.php' style='display: inline;'>
                                 <input type='hidden' name='claimId' value='<?php echo $claim['claimId']; ?>'>
                                 <input type='hidden' name='action' value='reject'>
+                                <input type='hidden' name='managerMessage' value=''>
                                 <button type='submit' class='confirm-button' data-action='reject'>Reject Claim</button>
                             </form>
 
@@ -188,10 +203,28 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <script>
         document.querySelectorAll('.confirm-button').forEach(button => {
             button.addEventListener('click', (e) => {
-            const action = button.getAttribute('data-action'); // This is either approve or reject
-            if (!confirm(`Are you sure you want to ${action} this claim?`)) {
-                e.preventDefault(); // Cancel 
-            }
+                e.preventDefault(); // Because this is done now, the return below cancels
+                const action = button.getAttribute('data-action');
+                const form = button.closest('form');
+
+                if (!confirm(`Are you sure you want to ${action} this claim?`)) {
+                    return; // Exit if user cancels
+                }
+
+                if (action === 'reject') {
+                    const managerMessage = prompt("Please provide a reason for rejection, or ask for employee elaboration (both optional):");
+                    
+                    // Only add what was typed in only if user didn't cancel the prompt
+                    if (managerMessage !== null) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'managerMessage';
+                        input.value = managerMessage;
+                        form.appendChild(input);
+                    }
+                }
+                
+                form.submit(); // Only submit text after all checks
             });
         });
     </script>

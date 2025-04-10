@@ -1,37 +1,45 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] !== 'Finance') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 
 require_once "models/DatabaseManager.php";
 $conn = DatabaseManager::getInstance()->getConnection();
 
-$sql = "SELECT expense_claims.*, employees.firstName, employees.lastName 
-        FROM expense_claims 
-        INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
-        WHERE status != 'Reimbursed'";
+// Get current logged-in employee ID
+$currentEmployeeId = $_SESSION['employeeId'];
 
-$params = [];
+$sql = "SELECT ec.*, e.firstName, e.lastName 
+        FROM expense_claims ec
+        INNER JOIN employees e ON ec.employeeId = e.employeeId
+        WHERE ec.status IN ('Approved', 'Rejected')
+          AND e.manager = (
+              SELECT manager
+              FROM employees
+              WHERE employeeId = :currentEmployeeId
+          )";
+
+$params = [':currentEmployeeId' => $currentEmployeeId];
 
 if (!empty($_GET['date'])) {
-    $sql .= " AND DATE(date) = :date";
+    $sql .= " AND DATE(ec.date) = :date";
     $params[':date'] = $_GET['date'];
 }
 if (!empty($_GET['category'])) {
-    $sql .= " AND category LIKE :category";
+    $sql .= " AND ec.category LIKE :category";
     $params[':category'] = '%' . $_GET['category'] . '%';
 }
 if (!empty($_GET['amount'])) {
-    $sql .= " AND amount = :amount";
+    $sql .= " AND ec.amount = :amount";
     $params[':amount'] = $_GET['amount'];
 }
 if (!empty($_GET['status'])) {
-    $sql .= " AND status = :status";
+    $sql .= " AND ec.status = :status";
     $params[':status'] = $_GET['status'];
 } else {
-    $sql .= " AND status != 'Reimbursed'";
+    $sql .= " AND ec.status != 'Reimbursed'";
 }
 
 
@@ -49,32 +57,41 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
 <div class="container">
-  <nav class="navbar">
-    <div class="logo">FDM Expense App - Finance</div>
-    <div class="nav-links">
-      <form method="POST" action="../php/logout.php">
-        <button class="Btn" type="submit">Logout</button>
-      </form>
-    </div>
-  </nav>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+        <h1 style="margin-left:2rem">Finance Portal</h1>
+
+        <div class="nav-links">
+            <form method="POST" action="../php/logout.php" style="display: inline;">
+                <button class="Btn" type="submit">
+                    <div class="sign">
+                    <svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg>
+                    </div>
+                    <div class="text">Logout</div>
+                </button>
+            </form>
+        </div>
+    </nav>
+    <br>
 
   <section class="active-alerts">
-    <h3>📋 All Claims (Finance View)</h3>
-    <form method="GET">
+    <h3 style="margin-bottom:1rem;">All Claims</h3>
+    <hr class="styled-hr">
+
+    <form method="GET" style="display: flex; flex-wrap: wrap; gap: 1rem;">
       <label>Status:</label>
-      <select name="status">
+      <select id="filter-select" name="status">
         <option value="">All</option>
-        <option value="Pending" <?= ($_GET['status'] ?? '') == 'Pending' ? 'selected' : '' ?>>Pending</option>
         <option value="Approved" <?= ($_GET['status'] ?? '') == 'Approved' ? 'selected' : '' ?>>Approved</option>
         <option value="Rejected" <?= ($_GET['status'] ?? '') == 'Rejected' ? 'selected' : '' ?>>Rejected</option>
-        <option value="Reimbursed" <?= ($_GET['status'] ?? '') == 'Reimbursed' ? 'selected' : '' ?>>Reimbursed</option>
       </select>
 
       <label>Date:</label>
-      <input type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>">
+      <input id="filter-text" type="date" name="date" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>">
 
       <label>Category:</label>
-      <select name="category">
+      <select id="filter-select" name="category">
         <option value="">All</option>
         <option value="Food">Food</option>
         <option value="Travel">Travel</option>
@@ -84,7 +101,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </select>
 
       <label>Amount:</label>
-      <input type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>">
+      <input id="filter-text" type="number" step="0.01" name="amount" value="<?= $_GET['amount'] ?? '' ?>">
 
       <button type="submit">Apply Filters</button>
       <a href="finance_dashboard.php"><button type="button">Reset</button></a>
@@ -97,7 +114,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php else: ?>
       <?php foreach ($claims as $claim): ?>
         <div class="report" id="claim-<?= $claim['claimId'] ?>">
-          <h4>Claim #<?= $claim['claimId'] ?></h4>
+          <h4>Claim <?= $claim['claimId'] ?></h4>
+          <hr class="styled-hr">
           <p><strong>Employee:</strong> <?= $claim['firstName'] . ' ' . $claim['lastName'] ?></p>
           <p><strong>Amount:</strong> <?= $claim['currency'] . ' ' . number_format($claim['amount'], 2) ?></p>
           <p><strong>Date:</strong> <?= date("d/m/Y", strtotime($claim['date'])) ?></p>
@@ -130,9 +148,11 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
   </section>
 
-  <section style="margin-top: 40px;">
-    <h3>📄 Generate Report</h3>
-    <form method="POST" action="../php/generate_report.php" target="_blank">
+  <section class="weather-map">
+    <h3 style="margin-bottom:0.7rem">Generate Report</h3>
+    <hr class="styled-hr">
+
+    <form method="POST" action="generate_report.php" target="_blank">
       <button type="submit">Download Reimbursed Claims (PDF)</button>
     </form>
   </section>

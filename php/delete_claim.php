@@ -3,16 +3,11 @@ session_start();
 require_once "models/DatabaseManager.php";
 
 // Ensure the user is logged in
-if (!isset($_SESSION['employeeId'])) {
-    header("Location: ../login.html");
+if (!isset($_SESSION['employeeId']) || $_SESSION['role'] !== 'Employee') {
+    header("Location: ../loginPage.php");
     exit();
 }
 
-// Ensure the user is an Employee
-if ($_SESSION['role'] !== 'Employee') {
-    header("Location: ../login.html");
-    exit();
-}
 
 // Check if the claimId is passed
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId'])) {
@@ -21,6 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId'])) {
 
     // Connect to the database
     $conn = DatabaseManager::getInstance()->getConnection();
+
+    $username = $_SESSION['username'];
+    $role = $_SESSION['role'];
+    $sql = "INSERT INTO sys_log (employeeId, username, role, event, eventTime) VALUES (:employeeId, (SELECT username FROM employees WHERE employeeId = :employeeId), :role, :event, NOW())";
+    $event = $username . " Deleted Claim " . $claimId;
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([':employeeId' => $employeeId, ':event' => $event, ':role' => $role]);
 
     // SQL query to delete the claim
     $sql = "DELETE FROM expense_claims WHERE claimId = ? AND employeeId = ?";

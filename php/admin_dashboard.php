@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Admin') {
-    header("Location: ../login.html");
+    header("Location: ../loginPage.php");
     exit();
 }
 require_once "models/DatabaseManager.php";
@@ -61,11 +61,12 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
     <!-- Navbar -->
     <nav class="navbar">
         <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+        <h1 style="margin-left:2rem">Admin Portal</h1>
         <div class="nav-links">
             <form method="POST" action="../php/logout.php" style="display: inline;">
                 <button class="Btn" type="submit">
                     <div class="sign">
-                        <svg viewBox="0 0 512 512"><path d="..."></path></svg>
+                    <svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg>
                     </div>
                     <div class="text">Logout</div>
                 </button>
@@ -76,11 +77,13 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
 
     <!-- User Table Section -->
     <section class="weather-map">
-        <h3>System users</h3>
+        <h3 style="margin-bottom: 1rem">System users</h3>
+        <hr class="styled-hr">
+
 
         <div class="tabs">
             <!-- Search and Filter Form -->
-            <form method="GET" action="admin_dashboard.php" style="display: inline;">
+            <form method="GET" action="admin_dashboard.php" style="display: flex; flex-wrap: wrap; gap: 20px;">
                 <input id="filter-text" type="text" name="search" placeholder="Search by username or first name..." value="<?= htmlspecialchars($searchTerm) ?>">
 
                 <select id="filter-select" name="role">
@@ -113,6 +116,8 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
                     <h4><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?> 
                         <span style="font-weight: normal;">(<?= $user['role'] ?>)</span>
                     </h4>
+                    <hr class="styled-hr">
+
                     <p>Email: <?= htmlspecialchars($user['email']) ?></p>
                     <p>Username: <?= htmlspecialchars($user['username']) ?></p>
                     <br>
@@ -127,21 +132,70 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
                         <input type="hidden" name="employeeId" value="<?= $user['employeeId'] ?>">
                         <button type="submit">Change Password</button>
                     </form>
+                    <?php if ($user['role'] === 'Manager'): ?>
+                        <!-- View Reports Button -->
+                        <form method="GET" action="update_limit.php" style="display:inline;">
+                            <input type="hidden" name="employeeId" value="<?= $user['employeeId'] ?>">
+                            <button type="submit">Update Spending Limit</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
     </section>
 
-    <!-- System Logs Placeholder -->
     <section class="weather-map">
         <h3>System Logs</h3>
+        <hr class="styled-hr">
+
         <div class="tabs">
-            <button>Search User</button>
-            <button>Sort Oldest</button>
-            <button>Sort Newest</button>
+            <form method="GET" action="admin_dashboard.php" style="display: inline;">
+                <input type="hidden" name="search" value="<?= htmlspecialchars($searchTerm) ?>">
+                <input type="hidden" name="role" value="<?= htmlspecialchars($roleFilter) ?>">
+                <button type="submit" name="sort" value="oldest">Sort Oldest</button>
+                <button type="submit" name="sort" value="newest">Sort Newest</button>
+            </form>
         </div>
         <br>
-        <div class="map-placeholder">[System Log table placeholder]</div>
+        <div class="scrollable-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>Action</th>
+                        <th>Username</th>
+                        <th>Employee ID</th>
+                        <th>Role</th>
+                        <th>Event Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sortOrder = isset($_GET['sort']) && $_GET['sort'] === 'oldest' ? 'ASC' : 'DESC';
+                    $logSql = "SELECT * FROM sys_log ORDER BY eventTime $sortOrder";
+                    $logStmt = $conn->prepare($logSql);
+                    $logStmt->execute();
+                    $logs = $logStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    if (count($logs) === 0): ?>
+                        <tr>
+                            <td colspan="5">No logs found.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($logs as $log): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($log['logId']) ?></td>
+                                <td><?= htmlspecialchars($log['event']) ?></td>
+                                <td><?= htmlspecialchars($log['username']) ?></td>
+                                <td><?= htmlspecialchars($log['employeeId']) ?></td>
+                                <td><?= htmlspecialchars($log['role']) ?></td>
+                                <td><?= htmlspecialchars($log['eventTime']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </section>
 </div>
 </body>

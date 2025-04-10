@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['employeeId']) || $_SESSION['role'] != 'Manager') {
+    header("Location: ../loginPage.php");
+    exit();
+}
 require_once "models/DatabaseManager.php";
 
 if (!isset($_GET['id'])) {
@@ -8,6 +13,12 @@ if (!isset($_GET['id'])) {
 }
 
 $claimId = $_GET['id'];
+$managerId = $_SESSION['employeeId'] ?? null;
+if (!$managerId) {
+    http_response_code(403);
+    echo "Unauthorized access.";
+    exit;
+}
 $conn = DatabaseManager::getInstance()->getConnection();
 
 try {
@@ -15,7 +26,6 @@ try {
     $stmt = $conn->prepare($sql);
     $stmt->execute([':claimId' => $claimId]);
 
-    session_start();
     $role = $_SESSION['role'] ?? '';
     if ($role === 'Finance') {
         header("Location: finance_dashboard.php");

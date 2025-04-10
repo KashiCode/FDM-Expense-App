@@ -64,6 +64,7 @@ CREATE TABLE `expense_claims` (
   `description` varchar(255) NOT NULL,
   `category` varchar(50) NOT NULL,
   `status` enum('Pending','Approved','Rejected','Reimbursed') DEFAULT 'Pending',
+  `managerMessage` varchar(500) DEFAULT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp(),
   `evidenceFile` varchar(255) NOT NULL,
   `receipt` varchar(255) NOT NULL,
@@ -123,7 +124,7 @@ CREATE TABLE `sys_log` (
   `logId` int(11) NOT NULL,
   `employeeId` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `role` enum('Employee','Manager','Finance') NOT NULL,
+  `role` enum('Employee','Manager','Finance', 'Admin') NOT NULL,
   `event` varchar(255) NOT NULL,
   `eventTime` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

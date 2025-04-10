@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Validate input
     if (empty($username) || empty($password)) {
-        echo "Username and password are required.";
+        $_SESSION["errorMessage"] = "Username and password are required.";
         exit;
     }
 
@@ -32,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['employeeId'] = $user['employeeId'];
+            $employeeId = $_SESSION['employeeId'];
+            $username = $_SESSION['username'];
+            $role = $_SESSION['role'];
             
 
             // Update loggedIn timestamp
@@ -39,6 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt2 = $conn->prepare($setLoggedIn);
             $stmt2->bindParam(1, $username); // Use numeric index for PDO
             $stmt2->execute();
+            $sql = "INSERT INTO sys_log (employeeId, username, role, event, eventTime) VALUES (:employeeId, (SELECT username FROM employees WHERE employeeId = :employeeId), :role, :event, NOW())";
+            $event = $username . " Logged In";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([':employeeId' => $employeeId, ':event' => $event, ':role' => $role]);
 
             // Redirect based on role
             switch ($user['role']) {
@@ -55,17 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     header("Location: finance_dashboard.php");
                     break;
                 default:
-                    echo "Invalid role. {$user['role']}";
+                    $_SESSION["errorMessage"] = "Invalid role. {$user['role']}";
                     break;
             }
             exit;
         } else {
-            echo "Invalid password.";
+             $_SESSION["errorMessage"] = "Invalid password.";
         }
     } else {
-        echo "User not found.";
+        $_SESSION["errorMessage"] = "User not found.";
     }
 } else {
-    echo "Invalid request method.";
+    $_SESSION["errorMessage"] = "Invalid request method.";
 }
+header("Location: ../loginPage.php");
+exit();
 ?>

@@ -18,7 +18,15 @@
     </header>
     <h1>Login</h1>
     <form id="loginForm" method="post" action="php/login.php">
-        <div id="error-message"></div>
+        <div id="error-message">
+            <?php
+            session_start();
+            if (isset($_SESSION['errorMessage'])) {
+                echo htmlspecialchars($_SESSION['errorMessage']);
+                unset($_SESSION['errorMessage']);
+            }
+            ?>
+        </div>
         <input type="text" id="email" name="username" placeholder="Username" required>
         <br>
         <input type="password" id="password" name="password" placeholder="Password" required>
