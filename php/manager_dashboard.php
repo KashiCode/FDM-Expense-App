@@ -60,6 +60,8 @@ $spendingLimit = $stmt->fetchColumn();
     <!-- Navbar -->
     <nav class="navbar">
         <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+        <h1 style="margin-left:2rem">Manager Portal</h1>
+
         <div class="nav-links">
             <form method="POST" action="../php/logout.php" style="display: inline;">
                 <button class="Btn" type="submit">
@@ -87,7 +89,9 @@ $spendingLimit = $stmt->fetchColumn();
     $alertclaims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if (!empty($alertclaims)) {
         echo '<section class="active-alerts">
-                <h3>⚠️ Account Alert ⚠️</h3>';
+                <h3>Account Alert</h3>
+                <hr class="styled-hr">';
+                
         foreach ($alertclaims as $alert) {
             echo '<div class="report">
                     <h4>New Claim Added</h4>
@@ -103,9 +107,10 @@ $spendingLimit = $stmt->fetchColumn();
     <!-- Claim Filter + Results -->
     <section class="weather-map">
         <h3>View All Claims</h3>
+        <hr class="styled-hr">
         <p style="font-size:1.5rem"><strong>Spending Limit: </strong>£<?php echo $spendingLimit?></p>
         <!-- Filter Form -->
-        <form method="GET">
+        <form method="GET" style="display: flex; flex-wrap: wrap; gap: 1rem;">
             <label for="status">Status:</label>
             <select id="filter-select" name="status" id="status">
                 <option value="">All</option>
@@ -138,7 +143,8 @@ $spendingLimit = $stmt->fetchColumn();
         <?php if ($claims): ?>
             <?php foreach ($claims as $claim): ?>
                 <div class="report">
-                    <h4>📝 Claim <?= $claim['claimId'] ?></h4>
+                    <h4>Claim <?= $claim['claimId'] ?></h4>
+                    <hr class="styled-hr">
                     <h5>Employee: <?= $claim['firstName'] . ' ' . $claim['lastName'] ?></h5>
                     <h4>Amount: <?= $claim['currency'] . ' ' . $claim['amount'] ?></h4>
                     <p><?= $claim['description'] ?></p>

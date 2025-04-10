@@ -59,6 +59,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Navbar -->
         <nav class="navbar">
             <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+            <h1 style="margin-left:2rem">Employee Portal</h1>
+
             <div class="nav-links">
                 <form method="POST" action="../php/logout.php">
                     <button class="Btn" type="submit">
@@ -81,7 +83,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Alerts -->
         <section class="active-alerts">
             <h3>Latest Claim Alert</h3>
-            <hr style="border: 1px solid #ccc;">
+            <hr class="styled-hr">
+
 
             <?php if ($recentClaim): ?>
                 <div class="report">
@@ -110,7 +113,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <section class="weather-map">
 
             <h3>View Claims</h3>
-            <hr style="border: 1px solid #ccc; margin: 20px 0;">
+            <hr class="styled-hr">
 
             <form method="GET" action="" style="display: flex; flex-wrap: wrap; gap: 20px;">
                 <input id="filter-date" type="date" name="date" value="<?= $_GET['date'] ?? '' ?>">
@@ -139,7 +142,9 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php else: ?>
                 <?php foreach ($claims as $index => $claim): ?>
                     <div class="report">
-                        <h4>Claim #<?= $index + 1 ?></h4>
+                        <h4>Claim <?= $index + 1 ?></h4>
+                        <hr class="styled-hr">
+
                         <p><strong>Amount:</strong> <?= $claim['currency'] ?> <?= number_format($claim['amount'], 2) ?></p>
                         <p><strong>Date Submitted:</strong> <?= date("d/m/Y H:i", strtotime($claim['date'])) ?></p>
                         <p><strong>Category:</strong> <?= $claim['category'] ?></p>

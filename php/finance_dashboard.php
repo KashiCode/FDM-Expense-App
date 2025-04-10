@@ -60,6 +60,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Navbar -->
     <nav class="navbar">
         <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+        <h1 style="margin-left:2rem">Finance Portal</h1>
+
         <div class="nav-links">
             <form method="POST" action="../php/logout.php" style="display: inline;">
                 <button class="Btn" type="submit">
@@ -74,8 +76,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <br>
 
   <section class="active-alerts">
-    <h3>📋 All Claims (Finance View)</h3>
-    <form method="GET">
+    <h3 style="margin-bottom:1rem;">All Claims</h3>
+    <hr class="styled-hr">
+
+    <form method="GET" style="display: flex; flex-wrap: wrap; gap: 1rem;">
       <label>Status:</label>
       <select id="filter-select" name="status">
         <option value="">All</option>
@@ -110,7 +114,8 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php else: ?>
       <?php foreach ($claims as $claim): ?>
         <div class="report" id="claim-<?= $claim['claimId'] ?>">
-          <h4>Claim #<?= $claim['claimId'] ?></h4>
+          <h4>Claim <?= $claim['claimId'] ?></h4>
+          <hr class="styled-hr">
           <p><strong>Employee:</strong> <?= $claim['firstName'] . ' ' . $claim['lastName'] ?></p>
           <p><strong>Amount:</strong> <?= $claim['currency'] . ' ' . number_format($claim['amount'], 2) ?></p>
           <p><strong>Date:</strong> <?= date("d/m/Y", strtotime($claim['date'])) ?></p>
@@ -143,8 +148,10 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
   </section>
 
-  <section style="margin-top: 40px;">
-    <h3>📄 Generate Report</h3>
+  <section class="weather-map">
+    <h3 style="margin-bottom:0.7rem">Generate Report</h3>
+    <hr class="styled-hr">
+
     <form method="POST" action="generate_report.php" target="_blank">
       <button type="submit">Download Reimbursed Claims (PDF)</button>
     </form>

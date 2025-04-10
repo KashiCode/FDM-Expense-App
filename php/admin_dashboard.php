@@ -61,6 +61,7 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
     <!-- Navbar -->
     <nav class="navbar">
         <a href="#"><img class="logo" src="../images/FDM_Group_Logo_White.png" width="200" alt="FDM Logo"></a>
+        <h1 style="margin-left:2rem">Admin Portal</h1>
         <div class="nav-links">
             <form method="POST" action="../php/logout.php" style="display: inline;">
                 <button class="Btn" type="submit">
@@ -76,11 +77,13 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
 
     <!-- User Table Section -->
     <section class="weather-map">
-        <h3>System users</h3>
+        <h3 style="margin-bottom: 1rem">System users</h3>
+        <hr class="styled-hr">
+
 
         <div class="tabs">
             <!-- Search and Filter Form -->
-            <form method="GET" action="admin_dashboard.php" style="display: inline;">
+            <form method="GET" action="admin_dashboard.php" style="display: flex; flex-wrap: wrap; gap: 20px;">
                 <input id="filter-text" type="text" name="search" placeholder="Search by username or first name..." value="<?= htmlspecialchars($searchTerm) ?>">
 
                 <select id="filter-select" name="role">
@@ -113,6 +116,8 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
                     <h4><?= htmlspecialchars($user['firstName'] . ' ' . $user['lastName']) ?> 
                         <span style="font-weight: normal;">(<?= $user['role'] ?>)</span>
                     </h4>
+                    <hr class="styled-hr">
+
                     <p>Email: <?= htmlspecialchars($user['email']) ?></p>
                     <p>Username: <?= htmlspecialchars($user['username']) ?></p>
                     <br>
@@ -141,6 +146,8 @@ $roles = ['Employee', 'Manager', 'Admin', 'Finance'];
 
     <section class="weather-map">
         <h3>System Logs</h3>
+        <hr class="styled-hr">
+
         <div class="tabs">
             <form method="GET" action="admin_dashboard.php" style="display: inline;">
                 <input type="hidden" name="search" value="<?= htmlspecialchars($searchTerm) ?>">
