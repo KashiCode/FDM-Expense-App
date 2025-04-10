@@ -9,6 +9,8 @@ use PHPMailer\PHPMailer\Exception;
 //Load Composer's autoloader
 require '../vendor/autoload.php';
 
+Print_r($_POST);
+
 // Check manager is logged in
 if (!isset($_SESSION['employeeId'])) {
     header("Location: ../login.html");
@@ -35,9 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     } elseif ($type === "reject") {
         $subject = "Claim " . $claimId . " Rejected!";
         $contents = "Your expense claim with ID " . $claimId . " has been rejected.</p><p style='color:#ffffff; line-height:1.6;'> Note: " . $note . "</p><p style='color:#ffffff; line-height:1.6;'> Please contact your manager for further details.";
-    } elseif ($type === "info") {
-        $subject = "More Information Needed About Expense Claim " . $claimId . ".";
-        $contents = "Additional information is required for your expense claim with ID " . $claimId . ".</p><p style='color:#ffffff; line-height:1.6;'> Note: " . $note . "</p><p style='color:#ffffff; line-height:1.6;'> Please provide the requested details.";
     } elseif ($type === "newExpense") {
         $subject = "New Claim " . $claimId . " from ".$Sname. ".";
         $contents =  $Sname . " has created a new expense claim: Claim " . $claimId . ".</p><p style='color:#ffffff; line-height:1.6;'>";
@@ -102,13 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
         $mail->isSMTP();                                            //Send using SMTP
         $mail->Host       = 'smtp.mailersend.net';                     //Set the SMTP server to send through
         $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-        $mail->Username   = 'MS_GS6vwk@test-p7kx4xw1098g9yjr.mlsender.net';                     //SMTP username
-        $mail->Password   = 'mssp.XFfv2jh.pq3enl60n57l2vwr.yhxoMZi';                               //SMTP password
+        $mail->Username   = 'MS_R6X0ER@test-r9084zvr50xgw63d.mlsender.net';                     //SMTP username
+        $mail->Password   = 'mssp.8AyZyjR.3yxj6ljvw50ldo2r.3pidemg';                               //SMTP password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
         $mail->Port       = 2525;                                    //TCP port to connect to;
 
         //Recipients
-        $mail->setFrom('expenses@test-p7kx4xw1098g9yjr.mlsender.net', 'FDM Expenses');
+        $mail->setFrom('expenses@test-r9084zvr50xgw63d.mlsender.net', 'FDM Expenses');
         $mail->addAddress($email, $name);     //Add a recipient
 
         //Content
@@ -125,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     echo $finEmail;
 
     // Use JavaScript to redirect after a delay
-    /*
+    
     if (!empty($redir)) {
         echo "<script>
             setTimeout(function() {
@@ -135,8 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ExpenseClaim']) && iss
     } else {
         echo "Redirection URL is missing.";
     }
-    */
-    header("Location: ".$redir);
+    
+    //header("Location: ".$redir);
 } else {
     die("Invalid request.");
 }

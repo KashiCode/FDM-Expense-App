@@ -163,6 +163,7 @@ $claims = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <input type='hidden' name='action' value=''>
 <input type='hidden' name='claimId' value=''>
 <input type='hidden' name='redir' value='../php/finance_dashboard.php'>
+<input type='hidden' name='note' value=''>
 </form>
 
 <script>

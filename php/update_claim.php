@@ -136,6 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <button type="submit">Update Claim</button>
 </form>
 
+<p></p>
 <div class="home-button">
     <a href="employee_dashboard.php">Homepage</a>
 </div>

@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     echo "<form name='notification' method='POST' action='../php/notification.php' enctype='multipart/form-data'>";
     echo "<input type='hidden' name='action' value='".$action."'>";
     echo "<input type='hidden' name='claimId' value='" .$claimId. "'>";
+    echo "<input type='hidden' name='note' value='" .$managerMessage. "'>";
     echo "<input type='hidden' name='redir' value='../php/manager_dashboard.php'>";
     echo "</form>";
     echo "<script type='text/javascript'>document.notification.submit();</script>";

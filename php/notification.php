@@ -2,7 +2,6 @@
 session_start();
 require_once "models/ExpenseClaim.php";
 
-
 // Ensure the user is logged in
 if (!isset($_SESSION["employeeId"])) {
     header("Location: ../login.html");
@@ -13,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
     $claimId = $_POST['claimId'];
     $action = $_POST['action']; // type of notification
     $redir = $_POST['redir'];
+    $note = $_POST['note'];
     $selected = '';
     $managerId = $_SESSION['employeeId'];
 
@@ -51,14 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['claimId']) && isset($_
 $options = [
     1 => 'approve',
     2 => 'reject',
-    3 => 'info',
-    4 => 'reimburse'
+    3 => 'reimburse'
 ];
 
 $typeText = [
     "approve" => 'Claim Approved',
     "reject" => 'Claim Rejected',
-    "info" => 'More Information Needed',
     "reimburse" => 'Reimbursement'
 ];
 
@@ -98,12 +96,7 @@ $message = ""
             <?php
                 $conn = DatabaseManager::getInstance()->getConnection();
                 
-                if ($action === 'info') {
-                    //Fetch all pending expense claim IDs
-                    $sql = "SELECT * FROM `expense_claims`
-                        INNER JOIN employees ON expense_claims.employeeId = employees.employeeId 
-                        WHERE STATUS = 'Pending';";
-                } else if ($action === 'accept' || $action === 'reject'|| $action === 'reimburse') {
+                if ($action === 'accept' || $action === 'reject'|| $action === 'reimburse') {
                     //Fetch specific expense claim being accepted, rejected or reimbursed
                     $sql = "SELECT * FROM `expense_claims` INNER JOIN employees ON expense_claims.employeeId = employees.employeeId WHERE expense_claims.claimId = ".$claimId.";";
                 } else {
@@ -160,7 +153,7 @@ $message = ""
 
         <!--Text Area for note-->
         <label for="note">Note:</label>
-        <textarea name="note"></textarea>
+        <textarea name="note"><?= $note?></textarea>
         <input type='hidden' name='redir' value='<?= $redir ?>'>
         <input type='hidden' name='Sname' value='<?= $managerFirstName ?> <?= $managerLastName ?>'>
 
